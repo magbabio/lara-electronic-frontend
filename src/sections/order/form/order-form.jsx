@@ -1,5 +1,5 @@
 // import { useState } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -34,6 +34,28 @@ export default function OrderForm() {
 
   const handleChange = (event) => {
     setDocumentType(event.target.value);
+  };
+
+  // Equipment methods
+
+  const [equipment, setEquipment] = useState([]);
+
+  const handleAddEquipment = (e) => {
+    const newEquipment = {
+      key: equipment.length + 1,
+      description: '',
+      brand: '',
+      model: '',
+      serial: '',
+      observations: '',
+    };
+    setEquipment([...equipment, newEquipment]);
+  };
+  
+  const handleDeleteEquipment = (index) => {
+    const newEquipment = [...equipment];
+    newEquipment.splice(index, 1);
+    setEquipment(newEquipment);
   };
 
   return (
@@ -117,7 +139,7 @@ export default function OrderForm() {
             <TextField
               disabled
               required
-              id="outlined-disabled"
+              id="outlined-required"
               label="Nombre"
               fullWidth
             />
@@ -126,7 +148,7 @@ export default function OrderForm() {
             <TextField
               disabled
               required
-              id="outlined-disabled"
+              id="outlined-required"
               label="Apellido"
               fullWidth
             />
@@ -135,7 +157,7 @@ export default function OrderForm() {
             <TextField
               disabled
               required
-              id="outlined-disabled"
+              id="outlined-required"
               label="Dirección"
               fullWidth
             />
@@ -144,7 +166,7 @@ export default function OrderForm() {
             <TextField
               disabled
               required
-              id="outlined-disabled"
+              id="outlined-required"
               label="Teléfono"
               fullWidth
             />
@@ -158,9 +180,81 @@ export default function OrderForm() {
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
-            <Button variant="contained" sx={{ width: "100%" }} startIcon={<Iconify icon="eva:plus-fill" />}>
+            <Button 
+              variant="contained" 
+              sx={{ width: "100%" }} 
+              startIcon={<Iconify icon="eva:plus-fill" />}
+              onClick={handleAddEquipment}
+              >
                 Agregar equipo
             </Button>
+          </Grid>
+
+          {equipment.map((item, index) => (
+            <Grid container p={3} spacing={2} key={index}>   
+              <Grid item xs={12} sm={6} md={6}>
+                <TextField
+                  required
+                  id="outlined-disabled"
+                  label="Descripción"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={6}>
+                <TextField
+                  required
+                  id="outlined-disabled"
+                  label="Marca"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={6}>
+                <TextField
+                  required
+                  id="outlined-disabled"
+                  label="Modelo"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={6}>
+                <TextField
+                  required
+                  id="outlined-disabled"
+                  label="Serial"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12}>
+                <TextField
+                  required
+                  id="outlined-disabled"
+                  label="Observaciones"
+                  fullWidth
+                  multiline
+                  rows={4}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12}>
+                <Grid container display="flex" justifyContent="center" alignItems="center">
+                  <Button 
+                    variant="contained" 
+                    sx={{ width: "100%" }} 
+                    startIcon={<Iconify icon="eva:trash-fill" />}
+                    onClick={() => handleDeleteEquipment(index)}
+                    >
+                    Eliminar equipo
+                  </Button>
+                </Grid>
+              </Grid>                                                                       
+            </Grid>
+            ))}    
+          <Grid item xs={12} sm={12} md={12}>
+            <Divider/>
+          </Grid>                  
+          <Grid item xs={12} sm={12} md={12}>
+            <Typography variant="subtitle1">
+              3. Datos
+            </Typography>
           </Grid>
           {/* Agrega más elementos Grid para más columnas si es necesario */}
         </Grid>
