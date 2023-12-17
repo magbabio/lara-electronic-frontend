@@ -33,6 +33,7 @@ export default function OrderForm() {
     defaultValues: {
       number: "",
       receipt_date: "17/12/2023",
+      order_status: "1",
       document_type: "",
       document_number: "",
       customer_id: "",
@@ -55,26 +56,11 @@ export default function OrderForm() {
   //   setSelectedDate(date);
   // };
 
-  // Customer document type methods
-
-  const [documentType, setDocumentType] = React.useState('');
-
-  const handleChange = (event) => {
-    setDocumentType(event.target.value);
-  };
-
-  // Order status methods
-
-  const [orderStatus, setOrderStatus] = React.useState('');
-
-  const handleChangeOrderStatus = (event) => {
-    setOrderStatus(event.target.value);
-  };
 
   // Submit data methods
 
-  const onSubmit = handleSubmit( (e) => {
-    console.log(e.target)
+  const onSubmit = handleSubmit( (data) => {
+    console.log(data)
   })
 
   // Equipment methods
@@ -169,21 +155,25 @@ export default function OrderForm() {
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel id="demo-simple-select-label">Estado</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={orderStatus}
-                  label="Estado"
-                  onChange={handleChangeOrderStatus}
-                >
-                  <MenuItem value="1">Por reparar</MenuItem>
-                  <MenuItem value="2">Falta de insumos</MenuItem>
-                  <MenuItem value="3">Reparada</MenuItem>                     
-      
-                </Select>
-              </FormControl>
+            <FormControl fullWidth required>
+              <InputLabel id="demo-simple-select-label">Estado</InputLabel>
+              <Controller
+                control={control}
+                name="order_status"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Estado"
+                  >
+                    <MenuItem value="1">Por reparar</MenuItem>
+                    <MenuItem value="2">Falta de insumos</MenuItem>
+                    <MenuItem value="3">Reparada</MenuItem>
+                  </Select>
+                )}
+              />
+            </FormControl>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
@@ -196,18 +186,23 @@ export default function OrderForm() {
             <Grid item xs={12} sm={5} md={5}>
               <FormControl fullWidth required>
                 <InputLabel id="demo-simple-select-label">Tipo de documento del cliente</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={documentType}
-                  label="Tipo de documento del cliente"
-                  onChange={handleChange}
-                >
-                  <MenuItem value="J">J</MenuItem>
-                  <MenuItem value="V">V</MenuItem>
-                  <MenuItem value="E">E</MenuItem>                     
-                  <MenuItem value="G">G</MenuItem>
-                </Select>
+                <Controller
+                  control={control}
+                  name="document_type"
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Tipo de documento del cliente"
+                    >
+                      <MenuItem value="J">J</MenuItem>
+                      <MenuItem value="V">V</MenuItem>
+                      <MenuItem value="E">E</MenuItem>
+                      <MenuItem value="G">G</MenuItem>
+                    </Select>
+                  )}
+                />
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={5} md={5}>
