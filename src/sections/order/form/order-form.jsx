@@ -1,4 +1,5 @@
-// import { useState } from 'react';
+import 'dayjs/locale/es';
+import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
@@ -32,8 +33,9 @@ export default function OrderForm() {
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
       number: "",
-      receipt_date: "17/12/2023",
+      receipt_date: null,
       order_status: "1",
+      received_by: "",
       document_type: "",
       document_number: "",
       customer_id: "",
@@ -41,7 +43,6 @@ export default function OrderForm() {
       last_name: "",
       address: "",
       phone: "",     
-      received_by: "",
       description: "",
       brand: "",
       model: "",
@@ -50,17 +51,11 @@ export default function OrderForm() {
     },
   });
 
-  // const [selectedDate, setSelectedDate] = useState(null);
-
-  // const handleDateChange = (date) => {
-  //   setSelectedDate(date);
-  // };
-
-
   // Submit data methods
 
   const onSubmit = handleSubmit( (data) => {
-    console.log(data)
+    const formattedDate = dayjs(data.receipt_date).format('YYYY-MM-DD');
+    console.log(data, formattedDate);
   })
 
   // Equipment methods
@@ -137,12 +132,18 @@ export default function OrderForm() {
             />
             </Grid>        
             <Grid item xs={12} sm={6} md={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker 
-                  label="Fecha de recepción" 
-                  fullWidth 
-                  disableFuture
-                  />
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es" dateLibInstance={dayjs}>
+                <Controller
+                  name="receipt_date"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      {...field}
+                      disableFuture
+                      label="Fecha de recepción"
+                    />
+                  )}
+                />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
