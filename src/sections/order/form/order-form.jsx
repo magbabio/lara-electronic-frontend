@@ -29,7 +29,25 @@ import Iconify from 'src/components/iconify';
 
 export default function OrderForm() {
 
-  const { handleSubmit, control } = useForm();
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      number: "",
+      receipt_date: "17/12/2023",
+      document_type: "",
+      document_number: "",
+      customer_id: "",
+      first_name: "",
+      last_name: "",
+      address: "",
+      phone: "",     
+      received_by: "",
+      description: "",
+      brand: "",
+      model: "",
+      serial: "",
+      observations: "",
+    },
+  });
 
   // const [selectedDate, setSelectedDate] = useState(null);
 
@@ -56,7 +74,6 @@ export default function OrderForm() {
   // Submit data methods
 
   const onSubmit = handleSubmit( (e) => {
-    e.preventDefault();
     console.log(e.target)
   })
 
@@ -128,6 +145,7 @@ export default function OrderForm() {
                     inputComponent: OnlyNumber
                   }}
                   onChange={(e) => field.onChange(e.target.value)}
+                  {...register("number")}
                 />
               )}
             />
@@ -142,21 +160,13 @@ export default function OrderForm() {
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <Controller
-                  name="received_by"
-                  control={control}
-                  render={({ field }) => (              
-                    <TextField
-                    {...field}
-                    required
-                    fullWidth
-                    label="Recibido por"
-                    id="received_by"
-                    defaultValue=""
-                    InputLabelProps={{ shrink: field.value }}                                                    
-                    />
-                  )}
-              /> 
+              <TextField
+                required
+                id="outlined-required"
+                label="Recibido por"
+                fullWidth
+                {...register("received_by")}
+              />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <FormControl fullWidth required>
@@ -201,11 +211,25 @@ export default function OrderForm() {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={5} md={5}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Número de documento del cliente"
-                fullWidth
+              <Controller
+                name="document_number"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Número de documento del cliente"
+                    id="document_number"
+                    value={field.value || ''}
+                    InputLabelProps={{ shrink: !!field.value }}
+                    InputProps={{
+                      inputComponent: OnlyNumber
+                    }}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    {...register("document_number")}
+                  />
+                )}
               />
             </Grid>         
             <Grid item xs={12} sm={2} md={2}>
@@ -278,6 +302,7 @@ export default function OrderForm() {
                     id="outlined-disabled"
                     label="Descripción"
                     fullWidth
+                    {...register("description")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
@@ -286,6 +311,7 @@ export default function OrderForm() {
                     id="outlined-disabled"
                     label="Marca"
                     fullWidth
+                    {...register("brand")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
@@ -294,6 +320,7 @@ export default function OrderForm() {
                     id="outlined-disabled"
                     label="Modelo"
                     fullWidth
+                    {...register("model")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
@@ -302,6 +329,7 @@ export default function OrderForm() {
                     id="outlined-disabled"
                     label="Serial"
                     fullWidth
+                    {...register("serial")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
@@ -312,10 +340,11 @@ export default function OrderForm() {
                     fullWidth
                     multiline
                     rows={4}
+                    {...register("observations")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
-                  yo
+                  Aquí va el dropzone de la imagen
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
                   <Grid container display="flex" justifyContent="center" alignItems="center">

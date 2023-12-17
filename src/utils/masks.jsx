@@ -3,7 +3,7 @@ import InputMask from 'react-input-mask';
 
 export const OnlyNumber = React.forwardRef((props, ref) => (
   <InputMask 
-    mask="9999999" 
+    mask="9999999999" 
     maskChar="" 
     {...props}
   >
