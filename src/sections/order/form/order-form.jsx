@@ -1,6 +1,7 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -27,6 +28,8 @@ import AlertDialog from 'src/components/AlertDialog';
 
 export default function OrderForm() {
 
+  const navigate = useNavigate();
+
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
       number: "",
@@ -42,6 +45,8 @@ export default function OrderForm() {
       phone: "",     
     },
   });
+
+  // Adding / deleting equipment methods
 
   const [equipment, setEquipment] = useState([]);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
@@ -79,13 +84,13 @@ export default function OrderForm() {
     setEquipment(newEquipment);
   };
 
-    // Submit data methods
+  // Submit data methods
 
-    const onSubmit = handleSubmit((data) => {
-      const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
-      console.log(data, formattedDate);
-      data.equipment = equipment;
-    });
+  const onSubmit = handleSubmit((data) => {
+    const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
+    console.log(data, formattedDate);
+    data.equipment = equipment;
+  });
 
   return (
     <Container>
@@ -94,7 +99,12 @@ export default function OrderForm() {
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:list-fill" />}>
+          <Button 
+          variant="contained"
+          color="inherit" 
+          startIcon={<Iconify icon="ph:list-fill" />}
+          onClick={() => navigate("/servicios")}
+          >
             Listado
           </Button>
         </Stack>
