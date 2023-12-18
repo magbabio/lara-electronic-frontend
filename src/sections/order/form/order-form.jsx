@@ -1,6 +1,8 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import {useDropzone} from 'react-dropzone'
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -23,8 +25,11 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { OnlyNumber } from 'src/utils/masks';
 
 import Iconify from 'src/components/iconify';
+import AlertDialog from 'src/components/AlertDialog';
 
 export default function OrderForm() {
+
+  const navigate = useNavigate();
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
@@ -42,7 +47,18 @@ export default function OrderForm() {
     },
   });
 
+  // Adding / deleting equipment methods
+
   const [equipment, setEquipment] = useState([]);
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [selectedEquipmentIndex, setSelectedEquipmentIndex] = useState(null);
+  const [selectedEquipmentDescription, setSelectedEquipmentDescription] = useState('');
+
+  const handleClickOpen = (index, description) => {
+    setSelectedEquipmentIndex(index);
+    setSelectedEquipmentDescription(description);
+    setOpenAlertDialog(true);
+  }
 
   const handleAddEquipment = (e) => {
     const newEquipment = {
@@ -51,30 +67,51 @@ export default function OrderForm() {
       brand: "",
       model: "",
       serial: "",
-      observations: ""
+      observations: "",
+      arrived_image: null
     };
     setEquipment([...equipment, newEquipment]);
   };
 
   const handleInputChange = (index, field, value) => {
-    const newEquipment = [...equipment];
-    newEquipment[index][field] = value;
-    setEquipment(newEquipment);
+    if (field === 'arrived_image') {
+      const newEquipment = [...equipment];
+      newEquipment[index][field] = value[0];
+      setEquipment(newEquipment);
+    } else {
+      const newEquipment = [...equipment];
+      newEquipment[index][field] = value;
+      setEquipment(newEquipment);
+    }
   };
 
   const handleDeleteEquipment = (index) => {
+    setOpenAlertDialog(false);
     const newEquipment = [...equipment];
     newEquipment.splice(index, 1);
     setEquipment(newEquipment);
   };
 
-    // Submit data methods
+  // Dropzone methods
 
-    const onSubmit = handleSubmit((data) => {
-      const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
-      console.log(data, formattedDate);
-      data.equipment = equipment;
-    });
+  const onDrop = useCallback(acceptedFiles => {
+    console.log(acceptedFiles[0]);
+    // Do something with the files
+  }, [])
+  const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
+
+
+  // Submit data methods
+
+  const onSubmit = handleSubmit((data) => {
+    const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
+    console.log(data, formattedDate);
+    data.equipment = equipment;
+  
+    const formData = new FormData();
+    formData.append("file", acceptedFiles[0]); 
+    formData.append("data", JSON.stringify(data));
+  });
 
   return (
     <Container>
@@ -83,7 +120,12 @@ export default function OrderForm() {
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:list-fill" />}>
+          <Button 
+          variant="contained"
+          color="inherit" 
+          startIcon={<Iconify icon="ph:list-fill" />}
+          onClick={() => navigate("/servicios")}
+          >
             Listado
           </Button>
         </Stack>
@@ -265,7 +307,7 @@ export default function OrderForm() {
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Typography variant="subtitle1">
-                3. Datos del equipo
+                3. Datos del servicio
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} md={4} sx={{mb: 1}}>
@@ -328,15 +370,44 @@ export default function OrderForm() {
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
-                  Aquí va el dropzone de la imagen
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'light', color: "#778591" }}>
+                    Imagen del equipo
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12}>
+                <div {...getRootProps()}
+                  style={{
+                    background: "transparent", 
+                    padding: "20px",
+                    border: "2px dashed #ccc", 
+                    borderRadius: "8px", 
+                    marginBottom: "16px"
+                  }}
+                >
+                  <input {...getInputProps()} onChange={(e) => handleInputChange(index, 'arrived_image', e.target.files)} /> 
+                  {isDragActive ? (
+                    <p>Suelta la imagen aquí...</p>
+                  ) : (
+                    <p>Arrastra y suelta la imagen aquí, o haz click para seleccionar la imagen</p>
+                  )}
+                </div>
+                {equipment[index].arrived_image && (
+                  <img src={URL.createObjectURL(equipment[index].arrived_image)} alt="" 
+                    style={{
+                      width: '300px',
+                      height: '300px'
+                    }}
+                  />
+                )}
                 </Grid>
                 <Grid item xs={12} sm={2} md={4}>
                   <Grid container display="flex" justifyContent="center" alignItems="center">
                   <Button
                     variant="contained"
+                    color="error"
                     sx={{ width: "100%" }}
-                    startIcon={<Iconify icon="eva:minus-fill" />}
-                    onClick={() => handleDeleteEquipment(index)}
+                    startIcon={<Iconify icon="eva:trash-fill" />}
+                    onClick={() => handleClickOpen(index, item.description)}
                   >
                     Eliminar equipo
                   </Button>
@@ -344,6 +415,16 @@ export default function OrderForm() {
                 </Grid>
               </Grid>
             ))}
+
+            <AlertDialog 
+              openAlertDialog={openAlertDialog} 
+              onClose={() => setOpenAlertDialog(false)} 
+              onActionClick={() => handleDeleteEquipment(selectedEquipmentIndex)} 
+              title="Eliminar equipo"
+              description="¿Está seguro que desea eliminar el equipo?"
+              name={selectedEquipmentDescription}
+              action="Eliminar"                  
+            />
 
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
