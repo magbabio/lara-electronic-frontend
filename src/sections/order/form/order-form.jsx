@@ -394,8 +394,10 @@ export default function OrderForm() {
                 {equipment[index].arrived_image && (
                   <img src={URL.createObjectURL(equipment[index].arrived_image)} alt="" 
                     style={{
-                      width: '300px',
-                      height: '300px'
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      width: "auto", 
+                      height: "auto",
                     }}
                   />
                 )}
