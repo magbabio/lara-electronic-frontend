@@ -23,6 +23,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { OnlyNumber } from 'src/utils/masks';
 
 import Iconify from 'src/components/iconify';
+import AlertDialog from 'src/components/AlertDialog';
 
 export default function OrderForm() {
 
@@ -43,6 +44,15 @@ export default function OrderForm() {
   });
 
   const [equipment, setEquipment] = useState([]);
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [selectedEquipmentIndex, setSelectedEquipmentIndex] = useState(null);
+  const [selectedEquipmentDescription, setSelectedEquipmentDescription] = useState('');
+
+  const handleClickOpen = (index, description) => {
+    setSelectedEquipmentIndex(index);
+    setSelectedEquipmentDescription(description);
+    setOpenAlertDialog(true);
+  }
 
   const handleAddEquipment = (e) => {
     const newEquipment = {
@@ -63,6 +73,7 @@ export default function OrderForm() {
   };
 
   const handleDeleteEquipment = (index) => {
+    setOpenAlertDialog(false);
     const newEquipment = [...equipment];
     newEquipment.splice(index, 1);
     setEquipment(newEquipment);
@@ -265,7 +276,7 @@ export default function OrderForm() {
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Typography variant="subtitle1">
-                3. Datos del equipo
+                3. Datos de los equipos
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} md={4} sx={{mb: 1}}>
@@ -334,9 +345,10 @@ export default function OrderForm() {
                   <Grid container display="flex" justifyContent="center" alignItems="center">
                   <Button
                     variant="contained"
+                    color="error"
                     sx={{ width: "100%" }}
-                    startIcon={<Iconify icon="eva:minus-fill" />}
-                    onClick={() => handleDeleteEquipment(index)}
+                    startIcon={<Iconify icon="eva:trash-fill" />}
+                    onClick={() => handleClickOpen(index, item.description)}
                   >
                     Eliminar equipo
                   </Button>
@@ -344,6 +356,16 @@ export default function OrderForm() {
                 </Grid>
               </Grid>
             ))}
+
+            <AlertDialog 
+              openAlertDialog={openAlertDialog} 
+              onClose={() => setOpenAlertDialog(false)} 
+              onActionClick={() => handleDeleteEquipment(selectedEquipmentIndex)} 
+              title="Eliminar equipo"
+              description="¿Está seguro que desea eliminar el equipo?"
+              name={selectedEquipmentDescription}
+              action="Eliminar"                  
+            />
 
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>

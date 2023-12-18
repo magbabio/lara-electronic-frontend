@@ -10,7 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
-export default function AlertDialog({ openAlertDialog, onClose, onActionClick, title, description, action }) {
+export default function AlertDialog({ openAlertDialog, onClose, onActionClick, title, description, name, action }) {
   const handleClose = () => {
     onClose();
   };
@@ -27,6 +27,9 @@ export default function AlertDialog({ openAlertDialog, onClose, onActionClick, t
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {description}
+        </DialogContentText>
+        <DialogContentText id="alert-dialog-name" sx={{ fontWeight: 'bold' }}>
+          {name}
         </DialogContentText>
       </DialogContent>
       <Divider />
@@ -49,6 +52,7 @@ AlertDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   onActionClick: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   action: PropTypes.string.isRequired,
 };
