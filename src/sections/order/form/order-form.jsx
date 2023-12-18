@@ -24,10 +24,6 @@ import { OnlyNumber } from 'src/utils/masks';
 
 import Iconify from 'src/components/iconify';
 
-
-
-// ----------------------------------------------------------------------
-
 export default function OrderForm() {
 
   const { register, handleSubmit, control } = useForm({
@@ -43,50 +39,42 @@ export default function OrderForm() {
       last_name: "",
       address: "",
       phone: "",     
-      description: "",
-      brand: "",
-      model: "",
-      serial: "",
-      observations: "",
     },
   });
 
-  // Submit data methods
-
-  const onSubmit = handleSubmit( (data) => {
-    const formattedDate = dayjs(data.receipt_date).format('YYYY-MM-DD');
-    console.log(data, formattedDate);
-  })
-
-  // Equipment methods
-
-  const [equipment, setEquipment] = useState([
-    { description: '', brand: '', model: '', serial: '', observations: '', image: null },
-  ]);
+  const [equipment, setEquipment] = useState([]);
 
   const handleAddEquipment = (e) => {
     const newEquipment = {
       key: equipment.length + 1,
-      description: '',
-      brand: '',
-      model: '',
-      serial: '',
-      observations: '',
+      description: "",
+      brand: "",
+      model: "",
+      serial: "",
+      observations: ""
     };
     setEquipment([...equipment, newEquipment]);
   };
-  
+
+  const handleInputChange = (index, field, value) => {
+    const newEquipment = [...equipment];
+    newEquipment[index][field] = value;
+    setEquipment(newEquipment);
+  };
+
   const handleDeleteEquipment = (index) => {
     const newEquipment = [...equipment];
     newEquipment.splice(index, 1);
     setEquipment(newEquipment);
   };
 
-  // const handleImageUpload = (file, index) => {
-  //   const updatedEquipment = [...equipment];
-  //   updatedEquipment[index].image = file;
-  //   setEquipment(updatedEquipment);
-  // };
+    // Submit data methods
+
+    const onSubmit = handleSubmit((data) => {
+      const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
+      console.log(data, formattedDate);
+      data.equipment = equipment;
+    });
 
   return (
     <Container>
@@ -121,7 +109,7 @@ export default function OrderForm() {
                   label="Número de orden"
                   id="number"
                   value={field.value || ''}
-                  InputLabelProps={{ shrink: !!field.value }}
+                  // InputLabelProps={{ shrink: !!field.value }}
                   InputProps={{
                     inputComponent: OnlyNumber
                   }}
@@ -139,6 +127,7 @@ export default function OrderForm() {
                   render={({ field }) => (
                     <DatePicker
                       {...field}
+                      slotProps={{ textField: { fullWidth: true } }}
                       disableFuture
                       label="Fecha de recepción"
                     />
@@ -218,7 +207,7 @@ export default function OrderForm() {
                     label="Número de documento del cliente"
                     id="document_number"
                     value={field.value || ''}
-                    InputLabelProps={{ shrink: !!field.value }}
+                    // InputLabelProps={{ shrink: !!field.value }}
                     InputProps={{
                       inputComponent: OnlyNumber
                     }}
@@ -239,7 +228,7 @@ export default function OrderForm() {
               <TextField
                 disabled
                 required
-                id="outlined-required"
+                id="first_name"
                 label="Nombre"
                 fullWidth
               />
@@ -248,7 +237,7 @@ export default function OrderForm() {
               <TextField
                 disabled
                 required
-                id="outlined-required"
+                id="last_name"
                 label="Apellido"
                 fullWidth
               />
@@ -257,7 +246,7 @@ export default function OrderForm() {
               <TextField
                 disabled
                 required
-                id="outlined-required"
+                id="address"
                 label="Dirección"
                 fullWidth
               />
@@ -266,7 +255,7 @@ export default function OrderForm() {
               <TextField
                 disabled
                 required
-                id="outlined-required"
+                id="phone"
                 label="Teléfono"
                 fullWidth
               />
@@ -279,7 +268,7 @@ export default function OrderForm() {
                 3. Datos del equipo
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={2} md={4} sx={{mb: 1}}>
               <Button 
                 variant="contained" 
                 sx={{ width: "100%" }} 
@@ -291,82 +280,82 @@ export default function OrderForm() {
             </Grid>
 
             {equipment.map((item, index) => (
-              <Grid container p={3} spacing={2} key={index}>   
+              <Grid container px={3} py={1} spacing={2} key={index}>
                 <Grid item xs={12} sm={6} md={6}>
-                  <TextField
-                    required
-                    id="outlined-disabled"
-                    label="Descripción"
-                    fullWidth
-                    {...register("description")}
-                  />
+                <TextField
+                  required
+                  label="Descripción"
+                  fullWidth
+                  value={item.description}
+                  onChange={(e) => handleInputChange(index, 'description', e.target.value)}
+                />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
                   <TextField
                     required
-                    id="outlined-disabled"
                     label="Marca"
                     fullWidth
-                    {...register("brand")}
+                    value={item.brand}
+                    onChange={(e) => handleInputChange(index, 'brand', e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
                   <TextField
                     required
-                    id="outlined-disabled"
                     label="Modelo"
                     fullWidth
-                    {...register("model")}
-                  />
+                    value={item.model}
+                    onChange={(e) => handleInputChange(index, 'model', e.target.value)}                  />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
                   <TextField
                     required
-                    id="outlined-disabled"
                     label="Serial"
                     fullWidth
-                    {...register("serial")}
+                    value={item.serial}
+                    onChange={(e) => handleInputChange(index, 'serial', e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
                   <TextField
                     required
-                    id="outlined-disabled"
                     label="Observaciones"
                     fullWidth
                     multiline
                     rows={4}
-                    {...register("observations")}
+                    value={item.observations}
+                    onChange={(e) => handleInputChange(index, 'observations', e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
                   Aquí va el dropzone de la imagen
                 </Grid>
-                <Grid item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={2} md={4}>
                   <Grid container display="flex" justifyContent="center" alignItems="center">
-                    <Button 
-                      variant="contained" 
-                      sx={{ width: "100%" }} 
-                      startIcon={<Iconify icon="eva:trash-fill" />}
-                      onClick={() => handleDeleteEquipment(index)}
-                      >
-                      Eliminar equipo
-                    </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ width: "100%" }}
+                    startIcon={<Iconify icon="eva:minus-fill" />}
+                    onClick={() => handleDeleteEquipment(index)}
+                  >
+                    Eliminar equipo
+                  </Button>
                   </Grid>
-                </Grid>                                                                       
+                </Grid>
               </Grid>
-              ))}    
+            ))}
+
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid>                  
             <Grid item xs={12} sm={12} md={12}>
               <Box display="flex" justifyContent="flex-end">
-                <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} type="submit">
+                <Button variant="contained" color="primary" startIcon={<Iconify icon="eva:plus-fill" />} type="submit">
                   Registrar orden
                 </Button>
               </Box>
             </Grid>         
-          </Grid>
+          </Grid>        
         </Card>
       </form>
     </Container>
