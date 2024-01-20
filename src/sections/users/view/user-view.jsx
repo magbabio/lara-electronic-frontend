@@ -134,7 +134,7 @@ export default function UsersPage() {
         <Typography variant="h4">Usuarios</Typography>
 
         <Stack direction="row" spacing={1} alignItems="center" mr={-1}>
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/clientes/crear")}>
+          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/usuarios/crear")}>
             Registrar
           </Button>
 

@@ -1,8 +1,6 @@
 import 'dayjs/locale/es';
-import dayjs from 'dayjs';
-import {useDropzone} from 'react-dropzone'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -16,19 +14,14 @@ import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import FormControl from '@mui/material/FormControl'
+import InputAdornment from '@mui/material/InputAdornment';
 
 import { OnlyNumber } from 'src/utils/masks';
-import { valOrderNumber,
-        valReceiptDate
-} from 'src/utils/validations/orderSchema';
 
 import Iconify from 'src/components/iconify';
-import AlertDialog from 'src/components/AlertDialog';
 
 export default function UserForm() {
 
@@ -36,104 +29,61 @@ export default function UserForm() {
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
-      number: "",
-      receipt_date: null,
-      order_status: "1",
-      received_by: "",
       document_type: "",
       document_number: "",
       customer_id: "",
       first_name: "",
       last_name: "",
-      address: "",
-      phone: "",     
+      phone: "", 
+      email: "",
+      password: "",
+      role: "",   
     },
   });
 
-  const [errors, setErrors] = useState({});
+  // const [errors, setErrors] = useState({});
 
-  // Adding / deleting equipment methods
+  // Password methods
 
-  const [equipment, setEquipment] = useState([]);
-  const [openAlertDialog, setOpenAlertDialog] = useState(false);
-  const [selectedEquipmentIndex, setSelectedEquipmentIndex] = useState(null);
-  const [selectedEquipmentDescription, setSelectedEquipmentDescription] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleClickOpen = (index, description) => {
-    setSelectedEquipmentIndex(index);
-    setSelectedEquipmentDescription(description);
-    setOpenAlertDialog(true);
-  }
-
-  const handleAddEquipment = (e) => {
-    const newEquipment = {
-      key: equipment.length + 1,
-      description: "",
-      brand: "",
-      model: "",
-      serial: "",
-      observations: "",
-      arrived_image: null
-    };
-    setEquipment([...equipment, newEquipment]);
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
   };
 
-  const handleInputChange = (index, field, value) => {
-    if (field === 'arrived_image') {
-      const newEquipment = [...equipment];
-      newEquipment[index][field] = value[0];
-      setEquipment(newEquipment);
-    } else {
-      const newEquipment = [...equipment];
-      newEquipment[index][field] = value;
-      setEquipment(newEquipment);
-    }
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prevState) => !prevState);
   };
-
-  const handleDeleteEquipment = (index) => {
-    setOpenAlertDialog(false);
-    const newEquipment = [...equipment];
-    newEquipment.splice(index, 1);
-    setEquipment(newEquipment);
-  };
-
-  // Dropzone methods
-
-  const onDrop = useCallback(acceptedFiles => {
-    console.log(acceptedFiles[0]);
-    // Do something with the files
-  }, [])
-  const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
-
 
   // Submit data methods
 
   const onSubmit = handleSubmit((data) => {
+    console.log(data);
 
-    const orderNumberError = valOrderNumber(data.number);
-    const receiptDateError = valReceiptDate(data.receipt_date);
+    // const orderNumberError = valOrderNumber(data.number);
+    // const receiptDateError = valReceiptDate(data.receipt_date);
 
-    if ( orderNumberError ) {
-      setErrors({
-        number: orderNumberError,
-        receipt_date: receiptDateError,
-      });
-      return; 
-    }
+    // if ( orderNumberError ) {
+    //   setErrors({
+    //     number: orderNumberError,
+    //     receipt_date: receiptDateError,
+    //   });
+    //   return; 
+    // }
 
-    const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
-    console.log(data, formattedDate);
-    data.equipment = equipment;
+    // const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
+    // console.log(data, formattedDate);
   
-    const formData = new FormData();
-    formData.append("file", acceptedFiles[0]); 
-    formData.append("data", JSON.stringify(data));
+    // const formData = new FormData();
+    // formData.append("file", acceptedFiles[0]); 
+    // formData.append("data", JSON.stringify(data));
   });
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Registrar orden de servicio</Typography>
+        <Typography variant="h4">Registrar usuario</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
@@ -150,96 +100,15 @@ export default function UserForm() {
 
       <form onSubmit={onSubmit} > 
         <Card>       
-          <Grid container p={3} spacing={2}>
+          <Grid container p={3} spacing={2}>    
             <Grid item xs={12} sm={12} md={12}>
               <Typography variant="subtitle1">
-                1. Datos de la orden
+                Datos del usuario
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-            <Controller
-              name="number"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  required
-                  fullWidth
-                  label="Número de orden"
-                  id="number"
-                  value={field.value || ''}
-                  // InputLabelProps={{ shrink: !!field.value }}
-                  InputProps={{
-                    inputComponent: OnlyNumber
-                  }}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  {...register("number")}
-                  error={!!errors.number} 
-                  helperText={errors.number}     
-                />
-              )}
-            />
-            </Grid>        
-            <Grid item xs={12} sm={6} md={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es" dateLibInstance={dayjs}>
-                <Controller
-                  name="receipt_date"
-                  control={control}
-                  rules={{ validate: valReceiptDate }}
-                  render={({ field }) => (
-                    <DatePicker
-                      {...field}
-                      slotProps={{ textField: { fullWidth: true } }}
-                      disableFuture
-                      label="Fecha de recepción"
-                      error={!!errors.receipt_date}
-                      helperText={errors.receipt_date?.message} // Muestra el mensaje de error correspondiente
-                    />
-                  )}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Recibido por"
-                fullWidth
-                {...register("received_by")}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={6}>
-            <FormControl fullWidth required>
-              <InputLabel id="demo-simple-select-label">Estado</InputLabel>
-              <Controller
-                control={control}
-                name="order_status"
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Estado"
-                  >
-                    <MenuItem value="1">Por reparar</MenuItem>
-                    <MenuItem value="2">Falta de insumos</MenuItem>
-                    <MenuItem value="3">Reparada</MenuItem>
-                  </Select>
-                )}
-              />
-            </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Divider/>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Typography variant="subtitle1">
-                2. Datos del cliente
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={5} md={5}>
               <FormControl fullWidth required>
-                <InputLabel id="demo-simple-select-label">Tipo de documento del cliente</InputLabel>
+                <InputLabel id="demo-simple-select-label">Tipo de documento del usuario</InputLabel>
                 <Controller
                   control={control}
                   name="document_type"
@@ -248,7 +117,7 @@ export default function UserForm() {
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      label="Tipo de documento del cliente"
+                      label="Tipo de documento del usuario"
                     >
                       <MenuItem value="J">J</MenuItem>
                       <MenuItem value="V">V</MenuItem>
@@ -259,7 +128,7 @@ export default function UserForm() {
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={5} md={5}>
+            <Grid item xs={12} sm={6} md={6}>
               <Controller
                 name="document_number"
                 control={control}
@@ -268,7 +137,7 @@ export default function UserForm() {
                     {...field}
                     required
                     fullWidth
-                    label="Número de documento del cliente"
+                    label="Número de documento del usuario"
                     id="document_number"
                     value={field.value || ''}
                     // InputLabelProps={{ shrink: !!field.value }}
@@ -281,16 +150,8 @@ export default function UserForm() {
                 )}
               />
             </Grid>         
-            <Grid item xs={12} sm={2} md={2}>
-              <Grid container display="flex" justifyContent="center" alignItems="center">
-                <Button variant="contained" sx={{ width: "100%" }} startIcon={<Iconify icon="eva:search-fill" />}>
-                  Buscar cliente
-                </Button>
-              </Grid>
-            </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <TextField
-                disabled
                 required
                 id="first_name"
                 label="Nombre"
@@ -299,7 +160,6 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <TextField
-                disabled
                 required
                 id="last_name"
                 label="Apellido"
@@ -308,155 +168,91 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <TextField
-                disabled
                 required
                 id="address"
                 label="Dirección"
                 fullWidth
               />
-            </Grid>
+            </Grid>          
             <Grid item xs={12} sm={6} md={6}>
               <TextField
-                disabled
                 required
                 id="phone"
                 label="Teléfono"
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Divider/>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Typography variant="subtitle1">
-                3. Datos del servicio
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={2} md={4} sx={{mb: 1}}>
-              <Button 
-                variant="contained" 
-                sx={{ width: "100%" }} 
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                onClick={handleAddEquipment}
-                >
-                  Agregar equipo
-              </Button>
-            </Grid>
-
-            {equipment.map((item, index) => (
-              <Grid container px={3} py={1} spacing={2} key={index}>
-                <Grid item xs={12} sm={6} md={6}>
-                <TextField
-                  required
-                  label="Descripción"
-                  fullWidth
-                  value={item.description}
-                  onChange={(e) => handleInputChange(index, 'description', e.target.value)}
-                />
-                </Grid>
-                <Grid item xs={12} sm={6} md={6}>
-                  <TextField
-                    required
-                    label="Marca"
-                    fullWidth
-                    value={item.brand}
-                    onChange={(e) => handleInputChange(index, 'brand', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={6}>
-                  <TextField
-                    required
-                    label="Modelo"
-                    fullWidth
-                    value={item.model}
-                    onChange={(e) => handleInputChange(index, 'model', e.target.value)}                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={6}>
-                  <TextField
-                    required
-                    label="Serial"
-                    fullWidth
-                    value={item.serial}
-                    onChange={(e) => handleInputChange(index, 'serial', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12}>
-                  <TextField
-                    required
-                    label="Observaciones"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={item.observations}
-                    onChange={(e) => handleInputChange(index, 'observations', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'light', color: "#778591" }}>
-                    Imagen del equipo
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12}>
-                <div {...getRootProps()}
-                  style={{
-                    background: "transparent", 
-                    padding: "20px",
-                    border: "2px dashed #ccc", 
-                    borderRadius: "8px", 
-                    marginBottom: "16px"
-                  }}
-                >
-                  <input {...getInputProps()} onChange={(e) => handleInputChange(index, 'arrived_image', e.target.files)} /> 
-                  {isDragActive ? (
-                    <p>Suelta la imagen aquí...</p>
-                  ) : (
-                    <p>Arrastra y suelta la imagen aquí, o haz click para seleccionar la imagen</p>
+            <Grid item xs={12} sm={6} md={6}>
+              <TextField
+                required
+                id="email"
+                label="Correo electrónico"
+                fullWidth
+              />
+            </Grid> 
+            <Grid item xs={12} sm={6} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel id="role">Rol</InputLabel>
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      labelId="role"
+                      id="role"
+                      label="Rol"
+                    >
+                      <MenuItem value="1">Admin</MenuItem>
+                      <MenuItem value="2">User</MenuItem>
+                    </Select>
                   )}
-                </div>
-                {equipment[index].arrived_image && (
-                  <img src={URL.createObjectURL(equipment[index].arrived_image)} alt="" 
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      width: "auto", 
-                      height: "auto",
-                    }}
-                  />
-                )}
-                </Grid>
-                <Grid item xs={12} sm={2} md={4}>
-                  <Grid container display="flex" justifyContent="center" alignItems="center">
-                  <Button
-                    variant="contained"
-                    color="error"
-                    sx={{ width: "100%" }}
-                    startIcon={<Iconify icon="eva:trash-fill" />}
-                    onClick={() => handleClickOpen(index, item.description)}
-                  >
-                    Eliminar equipo
-                  </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            ))}
-
-            <AlertDialog 
-              openAlertDialog={openAlertDialog} 
-              onClose={() => setOpenAlertDialog(false)} 
-              onActionClick={() => handleDeleteEquipment(selectedEquipmentIndex)} 
-              title="Eliminar equipo"
-              description="¿Está seguro que desea eliminar el equipo?"
-              name={selectedEquipmentDescription}
-              action="Eliminar"                  
-            />
-
+                />
+              </FormControl>
+            </Grid>    
+            <Grid item xs={12} sm={6} md={6}>
+              <TextField
+                required
+                id="password"
+                label="Contraseña"
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility}>
+                        {showPassword ? <Iconify icon="ic:baseline-visibility-off" /> : <Iconify icon="ic:baseline-visibility" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <TextField
+                required
+                id="confirm_password"
+                label="Repetir contraseña"
+                fullWidth
+                type={showConfirmPassword ? 'text' : 'password'}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={toggleConfirmPasswordVisibility}>
+                        {showConfirmPassword ? <Iconify icon="ic:baseline-visibility-off" /> : <Iconify icon="ic:baseline-visibility" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>                     
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
-            </Grid>                  
+            </Grid>               
             <Grid item xs={12} sm={12} md={12}>
               <Box display="flex" justifyContent="flex-end">
                 <Button variant="contained" color="primary" startIcon={<Iconify icon="eva:plus-fill" />} type="submit">
-                  Registrar orden
+                  Registrar usuario
                 </Button>
               </Box>
             </Grid>         
