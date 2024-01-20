@@ -31,12 +31,12 @@ export default function UserForm() {
     defaultValues: {
       document_type: "",
       document_number: "",
-      customer_id: "",
       first_name: "",
       last_name: "",
       phone: "", 
       email: "",
       password: "",
+      confirm_password: "",
       role: "",   
     },
   });
@@ -151,43 +151,70 @@ export default function UserForm() {
               />
             </Grid>         
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="first_name"
-                label="Nombre"
-                fullWidth
+              <Controller
+                name="first_name"
+                control={control}
+                defaultValue="" // Agrega un valor por defecto para el campo de nombre
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Nombre"
+                    id="first_name"
+                  />
+                )}
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="last_name"
-                label="Apellido"
-                fullWidth
+              <Controller
+                name="last_name"
+                control={control}
+                defaultValue="" // Agrega un valor por defecto para el campo de apellido
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Apellido"
+                    id="last_name"
+                  />
+                )}
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="address"
-                label="Dirección"
-                fullWidth
-              />
-            </Grid>          
-            <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="phone"
-                label="Teléfono"
-                fullWidth
+              <Controller
+                name="phone"
+                control={control}
+                defaultValue="" // Agrega un valor por defecto para el campo de teléfono
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Teléfono"
+                    id="phone"
+                  />
+                )}
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="email"
-                label="Correo electrónico"
-                fullWidth
+              <Controller
+                name="email"
+                control={control}
+                defaultValue="" // Agrega un valor por defecto para el campo de correo electrónico
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Correo electrónico"
+                    id="email"
+                  />
+                )}
               />
             </Grid> 
             <Grid item xs={12} sm={6} md={6}>
@@ -211,39 +238,61 @@ export default function UserForm() {
               </FormControl>
             </Grid>    
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="password"
-                label="Contraseña"
-                fullWidth
-                type={showPassword ? 'text' : 'password'}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={togglePasswordVisibility}>
-                        {showPassword ? <Iconify icon="ic:baseline-visibility-off" /> : <Iconify icon="ic:baseline-visibility" />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Contraseña"
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={togglePasswordVisibility}>
+                            {showPassword ? (
+                              <Iconify icon="ic:baseline-visibility-off" />
+                            ) : (
+                              <Iconify icon="ic:baseline-visibility" />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
-                required
-                id="confirm_password"
-                label="Repetir contraseña"
-                fullWidth
-                type={showConfirmPassword ? 'text' : 'password'}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={toggleConfirmPasswordVisibility}>
-                        {showConfirmPassword ? <Iconify icon="ic:baseline-visibility-off" /> : <Iconify icon="ic:baseline-visibility" />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
+              <Controller
+                name="confirm_password"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Repetir contraseña"
+                    id="confirm_password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={toggleConfirmPasswordVisibility}>
+                            {showConfirmPassword ? (
+                              <Iconify icon="ic:baseline-visibility-off" />
+                            ) : (
+                              <Iconify icon="ic:baseline-visibility" />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
               />
             </Grid>                     
             <Grid item xs={12} sm={12} md={12}>
