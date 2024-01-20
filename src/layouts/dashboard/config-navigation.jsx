@@ -14,12 +14,12 @@ const navConfig = [
   },
   {
     title: 'clientes',
-    path: '/products',
+    path: '/clientes',
     icon: <Iconify icon="ph:shopping-cart-fill" />,
   },
   {
-    title: 'usuarios',
-    path: '/blog',
+    title: 'Usuarios',
+    path: '/usuarios',
     icon:  <Iconify icon="majesticons:users" />,
   },
 ];

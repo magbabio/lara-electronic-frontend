@@ -11,7 +11,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function OrderTableToolbar({ numSelected, filterNumber, onFilterNumber }) {
+export default function UsersTableToolbar({ numSelected, filterDocument, onFilterDocument }) {
   return (
     <Toolbar
       sx={{
@@ -31,9 +31,9 @@ export default function OrderTableToolbar({ numSelected, filterNumber, onFilterN
         </Typography>
       ) : (
         <OutlinedInput
-          value={filterNumber}
-          onChange={onFilterNumber}
-          placeholder="Buscar orden..."
+          value={filterDocument}
+          onChange={onFilterDocument}
+          placeholder="Buscar cliente..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify
@@ -62,8 +62,8 @@ export default function OrderTableToolbar({ numSelected, filterNumber, onFilterN
   );
 }
 
-OrderTableToolbar.propTypes = {
+UsersTableToolbar.propTypes = {
   numSelected: PropTypes.number,
-  filterNumber: PropTypes.string,
-  onFilterNumber: PropTypes.func,
+  filterDocument: PropTypes.string,
+  onFilterDocument: PropTypes.func,
 };

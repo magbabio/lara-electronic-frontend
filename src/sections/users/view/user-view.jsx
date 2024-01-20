@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Card from '@mui/material/Card';
@@ -11,21 +11,24 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { orders } from 'src/_mock/order';
+import { getUsersRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import TableNoData from '../../table-no-data';
-import OrderTableHead from '../../table-head';
-import OrderTableRow from '../order-table-row';
-import TableEmptyRows from '../../table-empty-rows';
-import OrderTableToolbar from '../order-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import TableNoData from 'src/sections/table-no-data';
+import OrderTableHead from 'src/sections/table-head';
+import TableEmptyRows from 'src/sections/table-empty-rows';
+import { emptyRows, applyFilter, getComparator } from 'src/sections/order/utils';
+
+import UsersTableRow from '../users-table-row';
+import UsersTableToolbar from '../users-table-toolbar';
 
 // ----------------------------------------------------------------------
 
-export default function OrderPage() {
+export default function UsersPage() {
+
+  const [users, setUsers] = useState([]);
 
   const navigate = useNavigate()
 
@@ -35,34 +38,61 @@ export default function OrderPage() {
 
   const [selected, setSelected] = useState([]);
 
-  const [orderBy, setOrderBy] = useState('number');
+  const [userBy, setUserBy] = useState('created_at');
 
-  const [filterNumber, setFilterNumber] = useState('');
+  const [filterDocument, setFilterDocument] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}-${month}-${year}`;
+  };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getUsersRequest();
+        const formattedUsers = response.data.Data.map((user) => ({
+          ...user,
+          created_at: formatDate(user.created_at), 
+          updated_at: formatDate(user.updated_at),
+        }));
+        setUsers(formattedUsers);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    fetchUsers();
+  }, []);
+
   const handleSort = (event, id) => {
-    const isAsc = orderBy === id && order === 'asc';
+    const isAsc = userBy === id && order === 'asc';
     if (id !== '') {
       setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
+      setUserBy(id);
     }
   };
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = orders.map((n) => n.number);
+      const newSelecteds = users.map((n) => n.created_at);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, number) => {
-    const selectedIndex = selected.indexOf(number);
+  const handleClick = (event, created_at) => {
+    const selectedIndex = selected.indexOf(created_at);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, number);
+      newSelected = newSelected.concat(selected, created_at);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -85,26 +115,26 @@ export default function OrderPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByNumber = (event) => {
+  const handleFilterByDocument = (event) => {
     setPage(0);
-    setFilterNumber(event.target.value);
+    setFilterDocument(event.target.value);
   };
 
   const dataFiltered = applyFilter({
-    inputData: orders,
-    comparator: getComparator(order, orderBy),
-    filterNumber,
+    inputData: users,
+    comparator: getComparator(order, userBy),
+    filterDocument,
   });
 
-  const notFound = !dataFiltered.length && !!filterNumber;
+  const notFound = !dataFiltered.length && !!filterDocument;
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} gap={2}>
-        <Typography variant="h4">Servicios</Typography>
+        <Typography variant="h4">Usuarios</Typography>
 
         <Stack direction="row" spacing={1} alignItems="center" mr={-1}>
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/servicios/crear")}>
+          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/clientes/crear")}>
             Registrar
           </Button>
 
@@ -115,10 +145,10 @@ export default function OrderPage() {
       </Stack>
 
       <Card>
-        <OrderTableToolbar
+        <UsersTableToolbar
           numSelected={selected.length}
-          filterNumber={filterNumber}
-          onFilterNumber={handleFilterByNumber}
+          filterDocument={filterDocument}
+          onFilterDocument={handleFilterByDocument}
         />
 
         <Scrollbar>
@@ -126,44 +156,43 @@ export default function OrderPage() {
             <Table sx={{ minWidth: 800 }}>
               <OrderTableHead
                 order={order}
-                orderBy={orderBy}
-                rowCount={orders.length}
+                orderBy={userBy}
+                rowCount={users.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'number', label: 'Número de orden' },
-                  { id: 'customer', label: 'Cliente' },
-                  { id: 'receipt_date', label: 'Fecha de recepción' },
-                  { id: 'received_by', label: 'Recibido por' },
-                  { id: 'status', label: 'Estado' },
-                  { id: '' },
+                  { id: 'created_at', label: 'Fecha de creación' },
+                  { id: 'document_type', label: 'Tipo de documento' },
+                  { id: 'document_number', label: 'Número de documento' },
+                  { id: 'first_name', label: 'Nombre' },
+                  { id: 'last_name', label: 'Apellido' },
+                  { id: 'role', label: 'Rol' },
                 ]}
               />
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <OrderTableRow
+                    <UsersTableRow
                       key={row.id}
-                      number={row.number}
-                      customer={row.customer}
-                      receipt_date={row.receipt_date}
-                      received_by={row.received_by}
-                      status={row.status}
-                      company={row.company}
-                      // avatarUrl={row.avatarUrl}
-                      selected={selected.indexOf(row.number) !== -1}
-                      handleClick={(event) => handleClick(event, row.number)}
+                      created_at={row.created_at}
+                      document_type={row.document_type}
+                      document_number={row.document_number}
+                      first_name={row.first_name}
+                      last_name={row.last_name}
+                      role={row.role}
+                      selected={selected.indexOf(row.created_at) !== -1}
+                      handleClick={(event) => handleClick(event, row.created_at)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, orders.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
                 />
 
-                {notFound && <TableNoData query={filterNumber} />}
+                {notFound && <TableNoData query={filterDocument} />}
               </TableBody>
             </Table>
           </TableContainer>
@@ -172,7 +201,7 @@ export default function OrderPage() {
         <TablePagination
           page={page}
           component="div"
-          count={orders.length}
+          count={users.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
