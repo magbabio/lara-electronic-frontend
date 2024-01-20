@@ -15,13 +15,13 @@ export const valOrderNumber = (value) => {
 };
 
 export const valReceiptDate = (value) => {
-  
   if (!value) {
-      return 'Fecha de recepción es requerida';
-    }
+    return {
+      message: 'Fecha de recepción es requerida'
+    };
+  }
 
   return null;
-
 };
 
 export const valReceivedBy = (value) => {

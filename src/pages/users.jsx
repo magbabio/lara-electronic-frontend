@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { AppView } from 'src/sections/overview/view';
+import { UsersView } from 'src/sections/users/view';
 
 // ----------------------------------------------------------------------
 
-export default function AppPage() {
+export default function UsersPage() {
   return (
     <>
       <Helmet>
-        <title> Inicio | Lara Electrónica </title>
+        <title> Usuarios | Lara Electrónica </title>
       </Helmet>
 
-      <AppView />
+      <UsersView />
     </>
   );
 }

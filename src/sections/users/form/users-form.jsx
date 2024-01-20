@@ -30,7 +30,7 @@ import { valOrderNumber,
 import Iconify from 'src/components/iconify';
 import AlertDialog from 'src/components/AlertDialog';
 
-export default function OrderForm() {
+export default function UserForm() {
 
   const navigate = useNavigate();
 
@@ -200,27 +200,17 @@ export default function OrderForm() {
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-            <FormControl fullWidth required>
-              <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
-              <Controller
-                control={control}
-                name="customer_id"
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Recibido por"
-                  >
-                    <MenuItem value="1">Mariel</MenuItem>
-                  </Select>
-                )}
+              <TextField
+                required
+                id="outlined-required"
+                label="Recibido por"
+                fullWidth
+                {...register("received_by")}
               />
-            </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
             <FormControl fullWidth required>
-              <InputLabel id="demo-simple-select-label">Estado de la orden</InputLabel>
+              <InputLabel id="demo-simple-select-label">Estado</InputLabel>
               <Controller
                 control={control}
                 name="order_status"
@@ -229,11 +219,11 @@ export default function OrderForm() {
                     {...field}
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Estado de la orden"
+                    label="Estado"
                   >
-                    <MenuItem value="1">En proceso</MenuItem>
-                    <MenuItem value="2">Completada</MenuItem>
-                    <MenuItem value="3">Anulada</MenuItem>
+                    <MenuItem value="1">Por reparar</MenuItem>
+                    <MenuItem value="2">Falta de insumos</MenuItem>
+                    <MenuItem value="3">Reparada</MenuItem>
                   </Select>
                 )}
               />
