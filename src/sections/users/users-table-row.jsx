@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
-import Stack from '@mui/material/Stack';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import Iconify from 'src/components/iconify';
@@ -16,13 +15,19 @@ import Iconify from 'src/components/iconify';
 
 export default function UsersTableRow({
   selected,
+  id,
   created_at,
   document_type,
   document_number,
   first_name,
   last_name,
+  email,
+  role,
   handleClick,
 }) {
+
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -33,6 +38,14 @@ export default function UsersTableRow({
     setOpen(null);
   };
 
+  const handleDetails = () => {
+    navigate(`detalles/${id}`);
+  }
+
+  const handleUpdate = () => {
+    navigate(`editar/${id}`);
+  }
+
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -40,21 +53,17 @@ export default function UsersTableRow({
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
         </TableCell>
 
-        <TableCell component="th" scope="row" padding="none">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="subtitle2" noWrap>
-              {created_at}
-            </Typography>
-          </Stack>
-        </TableCell>
+        <TableCell>{created_at}</TableCell>
 
-        <TableCell>{document_type}</TableCell>
-
-        <TableCell>{document_number}</TableCell>
+        <TableCell>{document_type}{document_number}</TableCell>
 
         <TableCell>{first_name}</TableCell>
 
         <TableCell>{last_name}</TableCell>
+
+        <TableCell>{email}</TableCell>
+
+        <TableCell>{role}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -74,12 +83,12 @@ export default function UsersTableRow({
         }}
       >
 
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={handleDetails}>
           <Iconify icon="eva:eye-fill" sx={{ mr: 2 }} />
           Detalles
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={handleUpdate}>
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Editar
         </MenuItem>
@@ -94,7 +103,7 @@ export default function UsersTableRow({
 }
 
 UsersTableRow.propTypes = {
-  // avatarUrl: PropTypes.any,
+  id: PropTypes.any,
   created_at: PropTypes.any,
   handleClick: PropTypes.func,
   document_type: PropTypes.string,
@@ -102,4 +111,6 @@ UsersTableRow.propTypes = {
   first_name: PropTypes.string,
   selected: PropTypes.any,
   last_name: PropTypes.string,
+  email: PropTypes.string,
+  role: PropTypes.string
 };
