@@ -11,6 +11,7 @@ export const UsersPage = lazy(() => import('src/pages/users'));
 export const UserForm = lazy(() => import('src/pages/user-form'));
 export const UserShow = lazy(() => import('src/pages/user-show'));
 export const UserUpdate = lazy(() => import('src/pages/user-form'));
+export const UsersTrash = lazy(() => import('src/pages/users-trash'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -35,6 +36,7 @@ export default function Router() {
         { path: 'usuarios/crear', element: <UserForm /> },
         { path: 'usuarios/detalles/:id', element: <UserShow /> },
         { path: 'usuarios/editar/:id', element: <UserUpdate /> },
+        { path: 'usuarios/papelera', element: <UsersTrash /> },
 
       ],
     },

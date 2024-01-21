@@ -1,0 +1,1 @@
+export { default as UsersTrashView } from './user-view-trash';

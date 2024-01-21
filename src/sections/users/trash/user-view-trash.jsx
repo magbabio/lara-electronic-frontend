@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { getUsersRequest } from 'src/services/user/userAPI';
+import { getDeletedUsersRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -21,12 +21,12 @@ import OrderTableHead from 'src/sections/table-head';
 import TableEmptyRows from 'src/sections/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from 'src/sections/order/utils';
 
-import UsersTableRow from '../users-table-row';
+import UsersTableRowTrash from '../users-table-row-trash';
 import UsersTableToolbar from '../users-table-toolbar';
 
 // ----------------------------------------------------------------------
 
-export default function UsersPage() {
+export default function UsersTrashPage() {
 
   const [users, setUsers] = useState([]);
 
@@ -38,7 +38,7 @@ export default function UsersPage() {
 
   const [selected, setSelected] = useState([]);
 
-  const [userBy, setUserBy] = useState('created_at');
+  const [userBy, setUserBy] = useState('deleted_at');
 
   const [filterDocument, setFilterDocument] = useState('');
 
@@ -56,10 +56,10 @@ export default function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await getUsersRequest();
+        const response = await getDeletedUsersRequest();
         const formattedUsers = response.data.Data.map((user) => ({
           ...user,
-          created_at: formatDate(user.created_at), 
+          deleted_at: formatDate(user.deleted_at), 
           updated_at: formatDate(user.updated_at),
         }));
         setUsers(formattedUsers);
@@ -81,18 +81,18 @@ export default function UsersPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.created_at);
+      const newSelecteds = users.map((n) => n.deleted_at);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, created_at) => {
-    const selectedIndex = selected.indexOf(created_at);
+  const handleClick = (event, deleted_at) => {
+    const selectedIndex = selected.indexOf(deleted_at);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, created_at);
+      newSelected = newSelected.concat(selected, deleted_at);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -131,15 +131,16 @@ export default function UsersPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} gap={2}>
-        <Typography variant="h4">Usuarios</Typography>
+        <Typography variant="h4">Usuarios eliminados</Typography>
 
         <Stack direction="row" spacing={1} alignItems="center" mr={-1}>
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/usuarios/crear")}>
-            Registrar
-          </Button>
-
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />} onClick={() => navigate("/usuarios/papelera")}>
-            Papelera
+          <Button 
+          variant="contained"
+          color="inherit" 
+          startIcon={<Iconify icon="ph:list-fill" />}
+          onClick={() => navigate("/usuarios")}
+          >
+            Listado
           </Button>
         </Stack>
       </Stack>
@@ -162,7 +163,7 @@ export default function UsersPage() {
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'created_at', label: 'Fecha de creación' },
+                  { id: 'deleted_at', label: 'Fecha de eliminación' },
                   { id: 'document_type', label: 'Documento' },
                   { id: 'first_name', label: 'Nombre' },
                   { id: 'last_name', label: 'Apellido' },
@@ -175,18 +176,18 @@ export default function UsersPage() {
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <UsersTableRow
+                    <UsersTableRowTrash
                       key={row.id}
                       id={row.id}
-                      created_at={row.created_at}
+                      deleted_at={row.deleted_at}
                       document_type={row.document_type}
                       document_number={row.document_number}
                       first_name={row.first_name}
                       last_name={row.last_name}
                       email={row.email}
                       role={row.role}
-                      selected={selected.indexOf(row.created_at) !== -1}
-                      handleClick={(event) => handleClick(event, row.created_at)}
+                      selected={selected.indexOf(row.deleted_at) !== -1}
+                      handleClick={(event) => handleClick(event, row.deleted_at)}
                     />
                   ))}
 
