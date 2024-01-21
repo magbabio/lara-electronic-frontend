@@ -25,7 +25,7 @@ import { OnlyNumber } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 
-import { createUserRequest, getUserRequest } from 'src/services/user/userAPI';
+import { createUserRequest, getUserRequest, updateUserRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
 
@@ -94,8 +94,6 @@ export default function UserForm() {
         } finally {
           setIsLoading(false); 
         }
-      } else {
-        setErrorMessage('Ha ocurrido un error');
       }
     };
   
@@ -107,29 +105,47 @@ export default function UserForm() {
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');  
-    try {
-      const response = await createUserRequest(data);
-      const responseData = response.data;
-      const message = responseData.Message;
-  
-      setSuccessMessage(message);
 
-      setTimeout(() => {
-        navigate('/usuarios');
-      }, 2000);
+    if (params.id) {
+      try {
+        const response = await updateUserRequest(params.id,data);
+        const responseData = response.data;
+        const message = responseData.Message;
+        setSuccessMessage(message);
+        setTimeout(() => {
+          navigate('/usuarios');
+        }, 2000);
+      } catch (error) {
+        const message = error.response.data.Message;
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      try {
+        const response = await createUserRequest(data);
+        const responseData = response.data;
+        const message = responseData.Message;
+    
+        setSuccessMessage(message);
   
-    } catch (error) {
-      const message = error.response.data.Message;
-      setErrorMessage(message);
-    } finally {
-      setIsLoading(false);
+        setTimeout(() => {
+          navigate('/usuarios');
+        }, 2000);
+    
+      } catch (error) {
+        const message = error.response.data.Message;
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   });
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Registrar usuario</Typography>
+        <Typography variant="h4">{params.id ? "Editar usuario" : "Registrar usuario"}</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
@@ -137,7 +153,7 @@ export default function UserForm() {
           variant="contained"
           color="inherit" 
           startIcon={<Iconify icon="ph:list-fill" />}
-          onClick={() => navigate("/servicios")}
+          onClick={() => navigate("/usuarios")}
           >
             Listado
           </Button>
@@ -291,7 +307,7 @@ export default function UserForm() {
                 />
               </FormControl>
             </Grid>    
-            <Grid item xs={12} sm={6} md={6}>
+            {/* <Grid item xs={12} sm={6} md={6}>
               <Controller
                 name="password"
                 control={control}
@@ -348,14 +364,14 @@ export default function UserForm() {
                   />
                 )}
               />
-            </Grid>                     
+            </Grid>                      */}
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid>               
             <Grid item xs={12} sm={12} md={12}>
               <Box display="flex" justifyContent="flex-end">
-                <Button variant="contained" color="primary" startIcon={<Iconify icon="eva:plus-fill" />} type="submit">
-                  Registrar usuario
+                <Button variant="contained" color="primary" startIcon={params.id ? <Iconify icon="eva:edit-fill" /> : <Iconify icon="eva:plus-fill" />} type="submit">
+                {params.id ? "Editar usuario" : "Registrar usuario"}
                 </Button>
               </Box>
             </Grid>         
