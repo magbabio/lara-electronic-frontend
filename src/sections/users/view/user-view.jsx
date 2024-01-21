@@ -163,11 +163,12 @@ export default function UsersPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'created_at', label: 'Fecha de creación' },
-                  { id: 'document_type', label: 'Tipo de documento' },
-                  { id: 'document_number', label: 'Número de documento' },
+                  { id: 'document_type', label: 'Documento' },
                   { id: 'first_name', label: 'Nombre' },
                   { id: 'last_name', label: 'Apellido' },
+                  { id: 'email', label: 'Correo electrónico' },
                   { id: 'role', label: 'Rol' },
+                  { id: 'role', label: '' },
                 ]}
               />
               <TableBody>
@@ -176,11 +177,13 @@ export default function UsersPage() {
                   .map((row) => (
                     <UsersTableRow
                       key={row.id}
+                      id={row.id}
                       created_at={row.created_at}
                       document_type={row.document_type}
                       document_number={row.document_number}
                       first_name={row.first_name}
                       last_name={row.last_name}
+                      email={row.email}
                       role={row.role}
                       selected={selected.indexOf(row.created_at) !== -1}
                       handleClick={(event) => handleClick(event, row.created_at)}

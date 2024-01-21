@@ -45,7 +45,8 @@
     "react-hook-form": "^7.47.0",
     "react-input-mask": "^2.0.4",
     "react-router-dom": "^6.16.0",
-    "simplebar-react": "^3.2.4"
+    "simplebar-react": "^3.2.4",
+    "sweetalert2": "^11.10.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.4.0",

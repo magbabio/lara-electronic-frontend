@@ -10,6 +10,8 @@ import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
+import { useParams, useNavigate } from 'react-router-dom';
+
 import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -23,6 +25,11 @@ export default function CustomersTableRow({
   last_name,
   handleClick,
 }) {
+
+  const navigate = useNavigate();
+
+  const params = useParams();
+
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -32,6 +39,11 @@ export default function CustomersTableRow({
   const handleCloseMenu = () => {
     setOpen(null);
   };
+
+  const handleDetails = (params) => {
+    navigate(`detalles/${params.id}`);
+    console.log(params);
+  }
 
   return (
     <>
@@ -74,7 +86,7 @@ export default function CustomersTableRow({
         }}
       >
 
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={() => handleDetails(params)}>
           <Iconify icon="eva:eye-fill" sx={{ mr: 2 }} />
           Detalles
         </MenuItem>

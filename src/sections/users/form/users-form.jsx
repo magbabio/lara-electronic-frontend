@@ -1,6 +1,6 @@
 import 'dayjs/locale/es';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
 import Divider from '@mui/material/Divider';
+// import Backdrop from '@mui/material/Backdrop'
 import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
@@ -18,8 +19,13 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl'
 import InputAdornment from '@mui/material/InputAdornment';
+// import CircularProgress from '@mui/material/CircularProgress'
 
 import { OnlyNumber } from 'src/utils/masks';
+import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
+import { createUserRequest, getUserRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
 
@@ -27,7 +33,9 @@ export default function UserForm() {
 
   const navigate = useNavigate();
 
-  const { register, handleSubmit, control } = useForm({
+  const params = useParams();
+
+  const { register, handleSubmit, setValue, control } = useForm({
     defaultValues: {
       document_type: "",
       document_number: "",
@@ -43,6 +51,15 @@ export default function UserForm() {
 
   // const [errors, setErrors] = useState({});
 
+  // Loader
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Description alert
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
   // Password methods
 
   const [showPassword, setShowPassword] = useState(false);
@@ -56,28 +73,57 @@ export default function UserForm() {
     setShowConfirmPassword((prevState) => !prevState);
   };
 
-  // Submit data methods
+  // Load user
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
-
-    // const orderNumberError = valOrderNumber(data.number);
-    // const receiptDateError = valReceiptDate(data.receipt_date);
-
-    // if ( orderNumberError ) {
-    //   setErrors({
-    //     number: orderNumberError,
-    //     receipt_date: receiptDateError,
-    //   });
-    //   return; 
-    // }
-
-    // const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
-    // console.log(data, formattedDate);
+  useEffect(() => {
+    const loadUser = async () => {
+      if (params.id) {
+        try {
+          setIsLoading(true); 
+          const response = await getUserRequest(params.id);
+          setValue('document_type', response.data.Data.document_type);
+          setValue('document_number', response.data.Data.document_number);
+          setValue('first_name', response.data.Data.first_name);
+          setValue('last_name', response.data.Data.last_name);
+          setValue('phone', response.data.Data.phone);
+          setValue('email', response.data.Data.email);
+          setValue('role', response.data.Data.role);
+        } catch (error) {
+          const message = error.response.data.Message;
+          setErrorMessage(message);
+        } finally {
+          setIsLoading(false); 
+        }
+      } else {
+        setErrorMessage('Ha ocurrido un error');
+      }
+    };
   
-    // const formData = new FormData();
-    // formData.append("file", acceptedFiles[0]); 
-    // formData.append("data", JSON.stringify(data));
+    loadUser();
+  }, [params.id, setValue]); 
+
+  // Submit data methods
+  const onSubmit = handleSubmit(async (data) => {
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');  
+    try {
+      const response = await createUserRequest(data);
+      const responseData = response.data;
+      const message = responseData.Message;
+  
+      setSuccessMessage(message);
+
+      setTimeout(() => {
+        navigate('/usuarios');
+      }, 2000);
+  
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
   });
 
   return (
@@ -97,6 +143,14 @@ export default function UserForm() {
           </Button>
         </Stack>
       </Stack>
+
+      {successMessage && (
+        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
+      )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )}
+      <LoadingBackdrop isLoading={isLoading} />
 
       <form onSubmit={onSubmit} > 
         <Card>       
@@ -230,8 +284,8 @@ export default function UserForm() {
                       id="role"
                       label="Rol"
                     >
-                      <MenuItem value="1">Admin</MenuItem>
-                      <MenuItem value="2">User</MenuItem>
+                      <MenuItem value="Admin">Admin</MenuItem>
+                      <MenuItem value="User">User</MenuItem>
                     </Select>
                   )}
                 />
@@ -306,7 +360,7 @@ export default function UserForm() {
               </Box>
             </Grid>         
           </Grid>        
-        </Card>
+        </Card>       
       </form>
     </Container>
   );
