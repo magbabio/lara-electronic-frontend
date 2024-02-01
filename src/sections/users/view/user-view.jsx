@@ -138,7 +138,7 @@ export default function UsersPage() {
             Registrar
           </Button>
 
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />}>
+          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />} onClick={() => navigate("/usuarios/papelera")}>
             Papelera
           </Button>
         </Stack>

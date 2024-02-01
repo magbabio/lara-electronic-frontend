@@ -8,7 +8,7 @@ export default function OrderPage() {
   return (
     <>
       <Helmet>
-        <title> Órdenes | Lara Electrónica </title>
+        <title> Servicios | Lara Electrónica </title>
       </Helmet>
 
       <OrderView />

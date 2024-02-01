@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
@@ -12,36 +11,33 @@ import IconButton from '@mui/material/IconButton';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 
-import { deleteUserRequest } from 'src/services/user/userAPI';
+import { activateCustomerRequest } from 'src/services/customer/customerAPI';
 
 import Iconify from 'src/components/iconify';
 import AlertDialog from 'src/components/AlertDialog';
 
-
 // ----------------------------------------------------------------------
 
-export default function UsersTableRow({
+export default function CustomersTableRowTrash({
   selected,
   id,
-  created_at,
+  deleted_at,
   document_type,
   document_number,
   first_name,
   last_name,
   email,
-  role,
+  phone,
   handleClick,
 }) {
 
-  const navigate = useNavigate();
-
   const [open, setOpen] = useState(null);
 
-  // Selected user
+  // Selected customer
 
-  // const [selectedUserDocument, setSelectedUserDocument] = useState('');
-  const [selectedUserName, setSelectedUserName] = useState('');
-  // const [selectedUserEmail, setSelectedUserEmail] = useState('');
+  // const [selectedCustomerDocument, setSelectedCustomerDocument] = useState('');
+  const [selectedCustomerName, setSelectedCustomerName] = useState('');
+  // const [selectedCustomerEmail, setSelectedCustomerEmail] = useState('');
  
   // Messages
 
@@ -52,7 +48,7 @@ export default function UsersTableRow({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Delete user
+  // Delete customer
 
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
 
@@ -64,27 +60,19 @@ export default function UsersTableRow({
     setOpen(null);
   };
 
-  const handleDetails = () => {
-    navigate(`detalles/${id}`);
-  }
-
-  const handleUpdate = () => {
-    navigate(`editar/${id}`);
-  }
-
-  const handleOpenDelete = () => {
-    // setSelectedUserDocument(id);
-    setSelectedUserName(`${first_name} ${last_name}`);
-    // setSelectedUserEmail(email);
+  const handleOpenActivate = () => {
+    // setSelectedCustomerDocument(id);
+    setSelectedCustomerName(`${first_name} ${last_name}`);
+    // setSelectedCustomerEmail(email);
     setOpenAlertDialog(true);
   }
 
-  const handleDelete = async () => {
+  const handleActivate = async () => {
     try {
       setOpenAlertDialog(false); 
       handleCloseMenu();
       setIsLoading(true);
-      const response = await deleteUserRequest(id);
+      const response = await activateCustomerRequest(id);
       const message = response.data.Message;
       setSuccessMessage(message);
     } catch (error) {
@@ -105,7 +93,7 @@ export default function UsersTableRow({
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
         </TableCell>
 
-        <TableCell>{created_at}</TableCell>
+        <TableCell>{deleted_at}</TableCell>
 
         <TableCell>{document_type}{document_number}</TableCell>
 
@@ -113,9 +101,9 @@ export default function UsersTableRow({
 
         <TableCell>{last_name}</TableCell>
 
-        <TableCell>{email}</TableCell>
+        <TableCell>{phone}</TableCell>
 
-        <TableCell>{role}</TableCell>
+        <TableCell>{email}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -134,30 +122,19 @@ export default function UsersTableRow({
           sx: { width: 140 },
         }}
       >
-
-        <MenuItem onClick={handleDetails}>
-          <Iconify icon="eva:eye-fill" sx={{ mr: 2 }} />
-          Detalles
-        </MenuItem>
-
-        <MenuItem onClick={handleUpdate}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Editar
-        </MenuItem>
-
-        <MenuItem onClick={handleOpenDelete} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Eliminar
+        <MenuItem onClick={handleOpenActivate} sx={{ color: 'success.main' }}>
+          <Iconify icon="eva:checkmark-circle-2-outline" sx={{ mr: 2 }} />
+          Activar
         </MenuItem>
       </Popover>
       <AlertDialog 
         openAlertDialog={openAlertDialog} 
         onClose={() => setOpenAlertDialog(false)} 
-        onActionClick={handleDelete} 
-        title="Eliminar usuario"
-        description="¿Está seguro que desea eliminar el usuario?"
-        name={selectedUserName}
-        action="Eliminar"                  
+        onActionClick={handleActivate} 
+        title="Activar cliente"
+        description="¿Está seguro que desea activar el cliente?"
+        name={selectedCustomerName}
+        action="Activar"                  
       />
       {successMessage && (
         <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
@@ -170,15 +147,15 @@ export default function UsersTableRow({
   );
 }
 
-UsersTableRow.propTypes = {
+CustomersTableRowTrash.propTypes = {
   id: PropTypes.any,
-  created_at: PropTypes.any,
+  deleted_at: PropTypes.any,
   handleClick: PropTypes.func,
   document_type: PropTypes.string,
   document_number: PropTypes.string,
   first_name: PropTypes.string,
   selected: PropTypes.any,
   last_name: PropTypes.string,
+  phone: PropTypes.string,
   email: PropTypes.string,
-  role: PropTypes.string
 };

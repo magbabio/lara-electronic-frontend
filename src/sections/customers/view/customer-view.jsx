@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Card from '@mui/material/Card';
@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { customers } from 'src/_mock/customers';
+import { getCustomersRequest } from 'src/services/customer/customerAPI';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -29,6 +29,8 @@ import CustomersTableToolbar from '../customers-table-toolbar';
 
 export default function CustomersPage() {
 
+  const [customers, setCustomers] = useState([]);
+
   const navigate = useNavigate()
 
   const [page, setPage] = useState(0);
@@ -42,6 +44,33 @@ export default function CustomersPage() {
   const [filterDocument, setFilterDocument] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}-${month}-${year}`;
+  };
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await getCustomersRequest();
+        const formattedCustomers = response.data.Data.map((user) => ({
+          ...user,
+          created_at: formatDate(user.created_at), 
+          updated_at: formatDate(user.updated_at),
+        }));
+        setCustomers(formattedCustomers);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    fetchCustomers();
+  }, []);
 
   const handleSort = (event, id) => {
     const isAsc = customerBy === id && order === 'asc';
@@ -110,7 +139,7 @@ export default function CustomersPage() {
             Registrar
           </Button>
 
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />}>
+          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />} onClick={() => navigate("/clientes/papelera")}>
             Papelera
           </Button>
         </Stack>
@@ -135,10 +164,12 @@ export default function CustomersPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'created_at', label: 'Fecha de creación' },
-                  { id: 'document_type', label: 'Tipo de documento' },
-                  { id: 'document_number', label: 'Número de documento' },
+                  { id: 'document_type', label: 'Documento' },
                   { id: 'first_name', label: 'Nombre' },
                   { id: 'last_name', label: 'Apellido' },
+                  { id: 'phone', label: 'Teléfono' },
+                  { id: 'email', label: 'Correo electrónico' },
+                  { id: 'role', label: '' },
                 ]}
               />
               <TableBody>
@@ -147,11 +178,14 @@ export default function CustomersPage() {
                   .map((row) => (
                     <CustomersTableRow
                       key={row.id}
+                      id={row.id}
                       created_at={row.created_at}
                       document_type={row.document_type}
                       document_number={row.document_number}
                       first_name={row.first_name}
                       last_name={row.last_name}
+                      phone={row.phone}
+                      email={row.email}
                       selected={selected.indexOf(row.created_at) !== -1}
                       handleClick={(event) => handleClick(event, row.created_at)}
                     />

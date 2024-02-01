@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { LoginView } from 'src/sections/login';
+import { UsersTrashView } from 'src/sections/users/trash';
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function UsersPage() {
   return (
     <>
       <Helmet>
-        <title> Iniciar Sesión | Lara Electrónica </title>
+        <title> Usuarios | Lara Electrónica </title>
       </Helmet>
 
-      <LoginView />
+      <UsersTrashView />
     </>
   );
 }

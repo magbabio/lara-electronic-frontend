@@ -1,32 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
-import Stack from '@mui/material/Stack';
-import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
-import Label from 'src/components/label';
+import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
+import { deleteOrderRequest, generateOrderDocumentRequest } from 'src/services/order/orderAPI';
+import { getCustomersRequest } from 'src/services/customer/customerAPI';
+import { getUsersRequest } from 'src/services/user/userAPI';
+
+import Label from 'src/components/label/label';
 import Iconify from 'src/components/iconify';
+import AlertDialog from 'src/components/AlertDialog';
 
 // ----------------------------------------------------------------------
 
-export default function OrderTableRow({
+export default function OrdersTableRow({
   selected,
+  id,
+  created_at,
   number,
-  // avatarUrl,
-  customer,
+  customer_id,
   receipt_date,
-  received_by,
-  status,
+  user_id,
+  order_status,
   handleClick,
 }) {
+
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(null);
+
+  const [customerFirstName, setCustomerFirstName] = useState('');
+  const [customerLastName, setCustomerLastName] = useState('');
+
+  const [userFirstName, setUserFirstName] = useState('');
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const customers = await getCustomersRequest(); // Obtén los datos de todos los clientes
+        const customer = customers.data.Data.find((customer) => customer.id === customer_id); // Busca el cliente correspondiente por id
+        if (customer) {
+          setCustomerFirstName(customer.first_name);
+          setCustomerLastName(customer.last_name);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCustomers();
+  }, [customer_id]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await getUsersRequest(); // Obtén los datos de todos los clientes
+        const user = users.data.Data.find((user) => user.id === user_id); // Busca el cliente correspondiente por id
+        if (user) {
+          setUserFirstName(user.first_name);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUsers();
+  }, [user_id]);
+
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState('');
+ 
+  // Messages
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Loader
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Delete user
+
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -36,6 +100,58 @@ export default function OrderTableRow({
     setOpen(null);
   };
 
+  const handleDetails = () => {
+    navigate(`detalles/${id}`);
+  }
+
+  const handleUpdate = () => {
+    navigate(`editar/${id}`);
+  }
+
+  const handleOpenDelete = () => {
+    setSelectedOrderNumber(number);
+    setOpenAlertDialog(true);
+  }
+
+  const handleDelete = async () => {
+    try {
+      setOpenAlertDialog(false); 
+      handleCloseMenu();
+      setIsLoading(true);
+      const response = await deleteOrderRequest(id);
+      const message = response.data.Message;
+      setSuccessMessage(message);
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);  
+  }
+
+  const handleOrderDocument = async () => {
+    setErrorMessage('');
+    try {
+      setIsLoading(true);
+      const response = await generateOrderDocumentRequest(id);
+      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.target = '_blank';
+      link.click();
+    } catch (error) {
+      console.log(error);
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -43,26 +159,34 @@ export default function OrderTableRow({
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
         </TableCell>
 
-        <TableCell component="th" scope="row" padding="none">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            {/* <Avatar alt={number} src={avatarUrl} /> */}
-            <Avatar alt={number} />
-            <Typography variant="subtitle2" noWrap>
-              {number}
-            </Typography>
-          </Stack>
-        </TableCell>
+        <TableCell>{created_at}</TableCell>
 
-        <TableCell>{customer}</TableCell>
+        <TableCell>{number}</TableCell>
+
+        <TableCell>{customerFirstName} {customerLastName}</TableCell>
 
         <TableCell>{receipt_date}</TableCell>
 
-        <TableCell>{received_by}</TableCell>
+        <TableCell>{userFirstName}</TableCell>
 
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={(order_status === 'success' && 'error') || 'warning'}>{order_status}</Label>
         </TableCell>
 
+        <TableCell>
+          <Tooltip title="Imprimir orden" placement="top">
+            <IconButton onClick={() => handleOrderDocument()} style={{ cursor: 'pointer' }}>
+              <Iconify icon="material-symbols:print-outline-rounded"/>
+            </IconButton>
+          </Tooltip>
+        </TableCell>
+
+        <TableCell>
+          <Tooltip title="Enviar a cliente" placement="top">
+           <Iconify icon="material-symbols:stacked-email-outline-rounded"/>
+          </Tooltip>
+        </TableCell>
+        
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -81,32 +205,48 @@ export default function OrderTableRow({
         }}
       >
 
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={handleDetails}>
           <Iconify icon="eva:eye-fill" sx={{ mr: 2 }} />
           Detalles
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={handleUpdate}>
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Editar
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={handleOpenDelete} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Eliminar
         </MenuItem>
       </Popover>
+
+      <AlertDialog 
+        openAlertDialog={openAlertDialog} 
+        onClose={() => setOpenAlertDialog(false)} 
+        onActionClick={handleDelete} 
+        title="Eliminar usuario"
+        description="¿Está seguro que desea eliminar la orden?"
+        name={selectedOrderNumber}
+        action="Eliminar"                  
+      />
+      {successMessage && (
+        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
+      )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )}
+      <LoadingBackdrop isLoading={isLoading} />      
     </>
   );
 }
 
-OrderTableRow.propTypes = {
-  // avatarUrl: PropTypes.any,
-  customer: PropTypes.any,
+OrdersTableRow.propTypes = {
+  id: PropTypes.any,
+  created_at: PropTypes.any,
   handleClick: PropTypes.func,
-  received_by: PropTypes.any,
-  number: PropTypes.any,
-  receipt_date: PropTypes.any,
-  selected: PropTypes.any,
-  status: PropTypes.string,
+  number: PropTypes.string,
+  customer_id: PropTypes.string,
+  receipt_date: PropTypes.string,
+  order_status: PropTypes.any,
 };

@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-// import CustomersForm from 'src/sections/customer/form/customers-form';
+import { CustomersTrashView } from 'src/sections/customers/trash';
 
 // ----------------------------------------------------------------------
 
-export default function OrderPage() {
+export default function UsersPage() {
   return (
     <>
       <Helmet>
         <title> Clientes | Lara Electrónica </title>
       </Helmet>
 
-      {/* <CustomersForm /> */}
+      <CustomersTrashView />
     </>
   );
 }

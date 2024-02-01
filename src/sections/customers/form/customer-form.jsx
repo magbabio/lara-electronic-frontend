@@ -23,11 +23,11 @@ import { OnlyNumber } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 
-import { getUserRequest, createUserRequest, updateUserRequest } from 'src/services/user/userAPI';
+import { getCustomerRequest, createCustomerRequest, updateCustomerRequest } from 'src/services/customer/customerAPI';
 
 import Iconify from 'src/components/iconify';
 
-export default function UserForm() {
+export default function CustomerForm() {
 
   const navigate = useNavigate();
 
@@ -39,11 +39,10 @@ export default function UserForm() {
       document_number: "",
       first_name: "",
       last_name: "",
+      address: "",
       phone: "", 
       email: "",
-      password: "",
-      confirm_password: "",
-      role: "",   
+      notes: "" 
     },
   });
 
@@ -58,34 +57,22 @@ export default function UserForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Password methods
-
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // const togglePasswordVisibility = () => {
-  //   setShowPassword((prevState) => !prevState);
-  // };
-
-  // const toggleConfirmPasswordVisibility = () => {
-  //   setShowConfirmPassword((prevState) => !prevState);
-  // };
-
-  // Load user
+  // Load customer
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadCustomer = async () => {
       if (params.id) {
         try {
           setIsLoading(true); 
-          const response = await getUserRequest(params.id);
+          const response = await getCustomerRequest(params.id);
           setValue('document_type', response.data.Data.document_type);
           setValue('document_number', response.data.Data.document_number);
           setValue('first_name', response.data.Data.first_name);
           setValue('last_name', response.data.Data.last_name);
+          setValue('address', response.data.Data.address);
           setValue('phone', response.data.Data.phone);
           setValue('email', response.data.Data.email);
-          setValue('role', response.data.Data.role);
+          setValue('notes', response.data.Data.notes);
         } catch (error) {
           const message = error.response.data.Message;
           setErrorMessage(message);
@@ -95,7 +82,7 @@ export default function UserForm() {
       }
     };
   
-    loadUser();
+    loadCustomer();
   }, [params.id, setValue]); 
 
   // Submit data methods
@@ -106,12 +93,12 @@ export default function UserForm() {
 
     if (params.id) {
       try {
-        const response = await updateUserRequest(params.id,data);
+        const response = await updateCustomerRequest(params.id,data);
         const responseData = response.data;
         const message = responseData.Message;
         setSuccessMessage(message);
         setTimeout(() => {
-          navigate('/usuarios');
+          navigate('/clientes');
         }, 2000);
       } catch (error) {
         const message = error.response.data.Message;
@@ -121,14 +108,14 @@ export default function UserForm() {
       }
     } else {
       try {
-        const response = await createUserRequest(data);
+        const response = await createCustomerRequest(data);
         const responseData = response.data;
         const message = responseData.Message;
     
         setSuccessMessage(message);
   
         setTimeout(() => {
-          navigate('/usuarios');
+          navigate('/clientes');
         }, 2000);
     
       } catch (error) {
@@ -143,7 +130,7 @@ export default function UserForm() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{params.id ? "Editar usuario" : "Registrar usuario"}</Typography>
+        <Typography variant="h4">{params.id ? "Editar cliente" : "Registrar cliente"}</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
@@ -151,7 +138,7 @@ export default function UserForm() {
           variant="contained"
           color="inherit" 
           startIcon={<Iconify icon="ph:list-fill" />}
-          onClick={() => navigate("/usuarios")}
+          onClick={() => navigate("/clientes")}
           >
             Listado
           </Button>
@@ -171,12 +158,12 @@ export default function UserForm() {
           <Grid container p={3} spacing={2}>    
             <Grid item xs={12} sm={12} md={12}>
               <Typography variant="subtitle1">
-                Datos del usuario
+                Datos del cliente
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <FormControl fullWidth required>
-                <InputLabel id="demo-simple-select-label">Tipo de documento del usuario</InputLabel>
+                <InputLabel id="demo-simple-select-label">Tipo de documento del cliente</InputLabel>
                 <Controller
                   control={control}
                   name="document_type"
@@ -185,7 +172,7 @@ export default function UserForm() {
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      label="Tipo de documento del usuario"
+                      label="Tipo de documento del cliente"
                     >
                       <MenuItem value="J">J</MenuItem>
                       <MenuItem value="V">V</MenuItem>
@@ -205,7 +192,7 @@ export default function UserForm() {
                     {...field}
                     required
                     fullWidth
-                    label="Número de documento del usuario"
+                    label="Número de documento del cliente"
                     id="document_number"
                     value={field.value || ''}
                     // InputLabelProps={{ shrink: !!field.value }}
@@ -239,7 +226,7 @@ export default function UserForm() {
               <Controller
                 name="last_name"
                 control={control}
-                defaultValue="" // Agrega un valor por defecto para el campo de apellido
+                defaultValue="" 
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -252,11 +239,28 @@ export default function UserForm() {
               />
             </Grid>
 
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                name="address"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Dirección"
+                    id="address"
+                  />
+                )}
+              />
+            </Grid>
+
             <Grid item xs={12} sm={6} md={6}>
               <Controller
                 name="phone"
                 control={control}
-                defaultValue="" // Agrega un valor por defecto para el campo de teléfono
+                defaultValue="" 
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -273,7 +277,7 @@ export default function UserForm() {
               <Controller
                 name="email"
                 control={control}
-                defaultValue="" // Agrega un valor por defecto para el campo de correo electrónico
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -285,91 +289,33 @@ export default function UserForm() {
                 )}
               />
             </Grid> 
-            <Grid item xs={12} sm={6} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel id="role">Rol</InputLabel>
-                <Controller
-                  control={control}
-                  name="role"
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      labelId="role"
-                      id="role"
-                      label="Rol"
-                    >
-                      <MenuItem value="Admin">Admin</MenuItem>
-                      <MenuItem value="User">User</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>    
-            {/* <Grid item xs={12} sm={6} md={6}>
+
+            <Grid item xs={12} sm={12} md={12}>
               <Controller
-                name="password"
+                name="notes"
                 control={control}
+                defaultValue="" 
                 render={({ field }) => (
                   <TextField
                     {...field}
                     required
                     fullWidth
-                    label="Contraseña"
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={togglePasswordVisibility}>
-                            {showPassword ? (
-                              <Iconify icon="ic:baseline-visibility-off" />
-                            ) : (
-                              <Iconify icon="ic:baseline-visibility" />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
+                    multiline
+                    rows={4}
+                    label="Notas"
+                    id="notes"
                   />
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
-              <Controller
-                name="confirm_password"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    required
-                    fullWidth
-                    label="Repetir contraseña"
-                    id="confirm_password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={toggleConfirmPasswordVisibility}>
-                            {showConfirmPassword ? (
-                              <Iconify icon="ic:baseline-visibility-off" />
-                            ) : (
-                              <Iconify icon="ic:baseline-visibility" />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                )}
-              />
-            </Grid>                      */}
+
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid>               
             <Grid item xs={12} sm={12} md={12}>
               <Box display="flex" justifyContent="flex-end">
                 <Button variant="contained" color="primary" startIcon={params.id ? <Iconify icon="eva:edit-fill" /> : <Iconify icon="eva:plus-fill" />} type="submit">
-                {params.id ? "Editar usuario" : "Registrar usuario"}
+                {params.id ? "Editar cliente" : "Registrar cliente"}
                 </Button>
               </Box>
             </Grid>         

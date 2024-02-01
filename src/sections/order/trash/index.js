@@ -1,0 +1,1 @@
+export { default as OrdersTrashView } from './order-view-trash';
