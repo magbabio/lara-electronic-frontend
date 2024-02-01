@@ -132,14 +132,17 @@ export default function OrdersTableRow({
     }, 1000);  
   }
 
-  const handleOrderDocument= async () => {
+  const handleOrderDocument = async () => {
     setErrorMessage('');
     try {
       setIsLoading(true);
       const response = await generateOrderDocumentRequest(id);
-      const pdfBlob = new Blob([response], { type: 'application/pdf' });     
-      const pdfUrl = URL.createObjectURL(pdfBlob);      
-      window.open(pdfUrl);
+      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.target = '_blank';
+      link.click();
     } catch (error) {
       console.log(error);
       const message = error.response.data.Message;
@@ -147,7 +150,7 @@ export default function OrdersTableRow({
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
