@@ -1,9 +1,9 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
 import {useDropzone} from 'react-dropzone'
-import { useNavigate } from 'react-router-dom';
-import React, { useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -22,10 +22,16 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import { OnlyNumber } from 'src/utils/masks';
+import DescriptionAlert from 'src/utils/alert';
+import { DocumentNumber, OrderNumber } from 'src/utils/masks';
+import LoadingBackdrop from 'src/utils/loading';
 import { valOrderNumber,
         valReceiptDate
 } from 'src/utils/validations/orderSchema';
+
+import { getUsersRequest } from 'src/services/user/userAPI';
+import { getCustomerByDocumentRequest } from 'src/services/customer/customerAPI';
+import { getOrderRequest, createOrderRequest, updateOrderRequest } from 'src/services/order/orderAPI';
 
 import Iconify from 'src/components/iconify';
 import AlertDialog from 'src/components/AlertDialog';
@@ -34,21 +40,120 @@ export default function OrderForm() {
 
   const navigate = useNavigate();
 
-  const { register, handleSubmit, control } = useForm({
+  const params = useParams();
+
+  const { register, handleSubmit, setValue, control } = useForm({
     defaultValues: {
-      number: "",
-      receipt_date: null,
-      order_status: "1",
-      received_by: "",
-      document_type: "",
-      document_number: "",
-      customer_id: "",
-      first_name: "",
-      last_name: "",
-      address: "",
-      phone: "",     
+      order_status: 1,
+      user_id: 1,
     },
   });
+  
+  // Loader
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Description alert
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+    // Load order
+
+  useEffect(() => {
+    const loadOrder = async () => {
+      if (params.id) {
+        try {
+          setIsLoading(true); 
+          const response = await getOrderRequest(params.id);
+          console.log(response);
+          const convertedDate = dayjs(response.data.Data.receipt_date).format('DD/MM/YYYY');
+          setValue('receipt_date',convertedDate)
+          setValue('number', response.data.Data.number);
+          setValue('user_id', response.data.Data.User.id);
+          setValue('order_status', response.data.Data.order_status);
+          setValue('observations', response.data.Data.observations);
+          setDocumentType(response.data.Data.Customer.document_type);
+          setDocumentNumber(response.data.Data.Customer.document_number);
+          setValue('first_name', response.data.Data.Customer.first_name);
+          setValue('last_name', response.data.Data.Customer.last_name);
+          setValue('address', response.data.Data.Customer.address);
+          setValue('phone', response.data.Data.Customer.phone);
+          const equipmentData = response.data.Data.Equipment;
+          const newEquipment = equipmentData.map((item, index) => {
+            return {
+              key: index + 1,
+              description: item.description,
+              brand: item.brand,
+              model: item.model,
+              serial: item.serial,
+              repair_concept: item.repair_concept,
+              equipment_status: item.equipment_status,
+              observations: item.observations,
+              arrived_image: null
+            };
+          });
+          setEquipment(newEquipment);
+        } catch (error) {
+          const message = error.response.data.Message;
+          setErrorMessage(message);
+        } finally {
+          setIsLoading(false); 
+        }
+      }
+    };
+  
+    loadOrder();
+  }, [params.id, setValue]); 
+
+  // Show list of users for 'Received by'
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        setIsLoading(true); 
+        const response = await getUsersRequest();
+        setUsers(response.data.Data);
+      } catch (error) {
+        const message = error.response.data.Message;
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+
+    getUsers();
+  }, []);
+
+  // Search customer
+
+  const [document_type, setDocumentType] = useState('');
+  const [document_number, setDocumentNumber] = useState('');
+  const [showCustomerFields, setShowCustomerFields] = useState(false);
+
+  const handleSearchClick = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage(''); 
+    try {
+      const response = await getCustomerByDocumentRequest(document_type, document_number);
+      setValue('customer_id', response.data.Data.id);
+      setValue('first_name', response.data.Data.first_name);
+      setValue('last_name', response.data.Data.last_name);
+      setValue('address', response.data.Data.address);
+      setValue('phone', response.data.Data.phone);
+      setShowCustomerFields(true);
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  // Errors
 
   const [errors, setErrors] = useState({});
 
@@ -72,6 +177,8 @@ export default function OrderForm() {
       brand: "",
       model: "",
       serial: "",
+      repair_concept: "",
+      equipment_status: 1,
       observations: "",
       arrived_image: null
     };
@@ -108,7 +215,10 @@ export default function OrderForm() {
 
   // Submit data methods
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(async (data) => {
+
+    setErrorMessage('');
+    setSuccessMessage(''); 
 
     const orderNumberError = valOrderNumber(data.number);
     const receiptDateError = valReceiptDate(data.receipt_date);
@@ -121,19 +231,54 @@ export default function OrderForm() {
       return; 
     }
 
-    const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
-    console.log(data, formattedDate);
     data.equipment = equipment;
+    data.company_id = 1; // Esto hay que cambiarlo después idk
+
+    if (params.id) {
+      const formattedDate = dayjs(data.receipt_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+      data.receipt_date = formattedDate;
+      try {
+        const response = await updateOrderRequest(params.id,data);
+        const responseData = response.data;
+        const message = responseData.Message;
+        setSuccessMessage(message);
+      } catch (error) {
+        console.log(error);
+        const message = error.response.data.Message;
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      const formattedDate = dayjs(data.receipt_date).format("YYYY-MM-DD");
+      data.receipt_date = formattedDate;
+      try {
+        setIsLoading(true);
+        const response = await createOrderRequest(data);
+        const responseData = response.data;
+        const message = responseData.Message;
+        setSuccessMessage(message);
+      } catch (error) {
+        const message = error.response.data.Message;
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   
-    const formData = new FormData();
-    formData.append("file", acceptedFiles[0]); 
-    formData.append("data", JSON.stringify(data));
+    // const formData = new FormData();
+    // formData.append("file", acceptedFiles[0]); 
+    // formData.append("data", JSON.stringify(data));
   });
+
+  useEffect(() => {
+    setShowCustomerFields(false);
+  }, [document_type, document_number])
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Registrar orden de servicio</Typography>
+        <Typography variant="h4">{params.id ? "Editar orden de servicio" : "Registrar orden de servicio"}</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center" mr={-1}>
 
@@ -147,6 +292,14 @@ export default function OrderForm() {
           </Button>
         </Stack>
       </Stack>
+
+      {successMessage && (
+        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
+      )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )}
+      <LoadingBackdrop isLoading={isLoading} />      
 
       <form onSubmit={onSubmit} > 
         <Card>       
@@ -170,7 +323,7 @@ export default function OrderForm() {
                   value={field.value || ''}
                   // InputLabelProps={{ shrink: !!field.value }}
                   InputProps={{
-                    inputComponent: OnlyNumber
+                    inputComponent: OrderNumber
                   }}
                   onChange={(e) => field.onChange(e.target.value)}
                   {...register("number")}
@@ -185,6 +338,7 @@ export default function OrderForm() {
                 <Controller
                   name="receipt_date"
                   control={control}
+                  defaultValue={null}
                   rules={{ validate: valReceiptDate }}
                   render={({ field }) => (
                     <DatePicker
@@ -192,8 +346,13 @@ export default function OrderForm() {
                       slotProps={{ textField: { fullWidth: true } }}
                       disableFuture
                       label="Fecha de recepción"
+                      value={params.id ? dayjs(field.value || null, "DD/MM/YYYY") : field.value || null}
+                      onChange={(date) => field.onChange(date)}
+                      format="DD/MM/YYYY"
+                      inputFormat="DD/MM/YYYY"
+                      renderInput={(params) => <TextField {...params} value={convertedDate} />} // Asignar el valor convertido al campo de entrada                    
                       error={!!errors.receipt_date}
-                      helperText={errors.receipt_date?.message} // Muestra el mensaje de error correspondiente
+                      helperText={errors.receipt_date?.message}
                     />
                   )}
                 />
@@ -204,7 +363,7 @@ export default function OrderForm() {
               <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
               <Controller
                 control={control}
-                name="customer_id"
+                name="user_id"
                 render={({ field }) => (
                   <Select
                     {...field}
@@ -212,7 +371,11 @@ export default function OrderForm() {
                     id="demo-simple-select"
                     label="Recibido por"
                   >
-                    <MenuItem value="1">Mariel</MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.first_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 )}
               />
@@ -231,9 +394,9 @@ export default function OrderForm() {
                     id="demo-simple-select"
                     label="Estado de la orden"
                   >
-                    <MenuItem value="1">En proceso</MenuItem>
-                    <MenuItem value="2">Completada</MenuItem>
-                    <MenuItem value="3">Anulada</MenuItem>
+                    <MenuItem value={1}>En proceso</MenuItem>
+                    <MenuItem value={2}>Completada</MenuItem>
+                    <MenuItem value={3}>Anulada</MenuItem>
                   </Select>
                 )}
               />
@@ -259,6 +422,9 @@ export default function OrderForm() {
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                       label="Tipo de documento del cliente"
+                      {...register("document_type")}
+                      value={document_type} 
+                      onChange={(e) => setDocumentType(e.target.value)}
                     >
                       <MenuItem value="J">J</MenuItem>
                       <MenuItem value="V">V</MenuItem>
@@ -273,6 +439,7 @@ export default function OrderForm() {
               <Controller
                 name="document_number"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -280,60 +447,127 @@ export default function OrderForm() {
                     fullWidth
                     label="Número de documento del cliente"
                     id="document_number"
-                    value={field.value || ''}
-                    // InputLabelProps={{ shrink: !!field.value }}
+                    value={document_number}
                     InputProps={{
-                      inputComponent: OnlyNumber
+                      inputComponent: DocumentNumber
                     }}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    {...register("document_number")}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      setDocumentNumber(e.target.value);
+                    }}
                   />
                 )}
               />
-            </Grid>         
+            </Grid>
+
             <Grid item xs={12} sm={2} md={2}>
               <Grid container display="flex" justifyContent="center" alignItems="center">
-                <Button variant="contained" sx={{ width: "100%" }} startIcon={<Iconify icon="eva:search-fill" />}>
+                <Button 
+                  variant="contained" 
+                  sx={{ width: "100%" }} 
+                  startIcon={<Iconify icon="eva:search-fill" />}
+                  onClick={handleSearchClick}
+                >
                   Buscar cliente
                 </Button>
               </Grid>
             </Grid>
+
+            {showCustomerFields && (
+            <>
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
+              <Controller
                 disabled
-                required
-                id="first_name"
-                label="Nombre"
-                fullWidth
+                name="first_name"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Nombre"
+                    id="first_name"
+                    {...register("first_name")}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
+              <Controller
                 disabled
-                required
-                id="last_name"
-                label="Apellido"
-                fullWidth
+                name="last_name"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Apellido"
+                    id="last_name"
+                    {...register("last_name")}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
+              <Controller
                 disabled
-                required
-                id="address"
-                label="Dirección"
-                fullWidth
+                name="address"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Dirección"
+                    id="address"
+                    {...register("address")}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <TextField
+              <Controller
                 disabled
-                required
-                id="phone"
-                label="Teléfono"
-                fullWidth
+                name="phone"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Teléfono"
+                    id="phone"
+                    {...register("phone")}
+                  />
+                )}
               />
             </Grid>
+            <Grid item xs={0} sm={0} md={0}>
+              <Controller
+                name="customer_id"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    id="customer_id"
+                    {...register("customer_id")}
+                    hidden 
+                    style={{ display: 'none' }} 
+                  />
+                )}
+              />
+            </Grid>
+            </>
+            )}
+
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid>
@@ -358,7 +592,7 @@ export default function OrderForm() {
                 <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   required
-                  label="Descripción"
+                  label="Nombre"
                   fullWidth
                   value={item.description}
                   onChange={(e) => handleInputChange(index, 'description', e.target.value)}
@@ -390,10 +624,35 @@ export default function OrderForm() {
                     onChange={(e) => handleInputChange(index, 'serial', e.target.value)}
                   />
                 </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    required
+                    label="Concepto de reparación"
+                    fullWidth
+                    value={item.repair_concept}
+                    onChange={(e) => handleInputChange(index, 'repair_concept', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel id={`demo-simple-select-label-${index}`}>Estado del equipo</InputLabel>
+                    <Select
+                      labelId={`demo-simple-select-label-${index}`}
+                      id={`demo-simple-select-${index}`}
+                      label="Estado del equipo"
+                      value={item.equipment_status}
+                      onChange={(e) => handleInputChange(index, 'equipment_status', e.target.value)}
+                    >
+                      <MenuItem value={1}>Por reparar</MenuItem>
+                      <MenuItem value={2}>Falta de insumos</MenuItem>  {/* Disponible sólo al editar (que exista params.id) */}
+                      <MenuItem value={3}>Reparada</MenuItem> {/* Disponible sólo al editar (que exista params.id) */}
+                    </Select>
+                  </FormControl>
+                </Grid>
                 <Grid item xs={12} sm={12} md={12}>
                   <TextField
                     required
-                    label="Observaciones"
+                    label="Observaciones del equipo"
                     fullWidth
                     multiline
                     rows={4}
@@ -401,7 +660,7 @@ export default function OrderForm() {
                     onChange={(e) => handleInputChange(index, 'observations', e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12} sm={12} md={12}>
+                {/* <Grid item xs={12} sm={12} md={12}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 'light', color: "#778591" }}>
                     Imagen del equipo
                   </Typography>
@@ -433,7 +692,7 @@ export default function OrderForm() {
                     }}
                   />
                 )}
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm={2} md={4}>
                   <Grid container display="flex" justifyContent="center" alignItems="center">
                   <Button
@@ -450,6 +709,31 @@ export default function OrderForm() {
               </Grid>
             ))}
 
+            <Grid item xs={12} sm={12} md={12}>
+              <Divider/>
+            </Grid> 
+
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                multiline
+                rows={4}
+                name="observations"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    multiline
+                    rows={4}
+                    required
+                    fullWidth
+                    label="Observaciones de la orden"
+                    id="observations"
+                  />
+                )}
+              />
+            </Grid>
+
             <AlertDialog 
               openAlertDialog={openAlertDialog} 
               onClose={() => setOpenAlertDialog(false)} 
@@ -462,11 +746,12 @@ export default function OrderForm() {
 
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
-            </Grid>                  
+            </Grid>             
+
             <Grid item xs={12} sm={12} md={12}>
               <Box display="flex" justifyContent="flex-end">
-                <Button variant="contained" color="primary" startIcon={<Iconify icon="eva:plus-fill" />} type="submit">
-                  Registrar orden
+                <Button variant="contained" color="primary" startIcon={params.id ? <Iconify icon="eva:edit-fill" /> : <Iconify icon="eva:plus-fill" />} type="submit">
+                {params.id ? "Editar orden de servicio" : "Registrar orden de servicio"}
                 </Button>
               </Box>
             </Grid>         

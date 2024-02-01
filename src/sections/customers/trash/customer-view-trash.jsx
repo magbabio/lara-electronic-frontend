@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { getOrdersRequest } from 'src/services/order/orderAPI';
+import { getDeletedCustomersRequest } from 'src/services/customer/customerAPI';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -21,14 +21,14 @@ import OrderTableHead from 'src/sections/table-head';
 import TableEmptyRows from 'src/sections/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from 'src/sections/order/utils';
 
-import OrdersTableRow from '../order-table-row';
-import OrdersTableToolbar from '../order-table-toolbar';
+import CustomersTableToolbar from '../customers-table-toolbar';
+import CustomersTableRowTrash from '../customers-table-row-trash';
 
 // ----------------------------------------------------------------------
 
-export default function OrdersPage() {
+export default function CustomersTrashPage() {
 
-  const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
   const navigate = useNavigate()
 
@@ -38,7 +38,7 @@ export default function OrdersPage() {
 
   const [selected, setSelected] = useState([]);
 
-  const [customerBy, setCustomerBy] = useState('created_at');
+  const [customerBy, setCustomerBy] = useState('deleted_at');
 
   const [filterDocument, setFilterDocument] = useState('');
 
@@ -54,37 +54,22 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchCustomers = async () => {
       try {
-        const response = await getOrdersRequest();
-        const formattedOrders = response.data.Data.map((order) => ({
-          ...order,
-          receipt_date: formatDate(order.receipt_date),
-          created_at: formatDate(order.created_at), 
-          updated_at: formatDate(order.updated_at),
-          order_status: getOrderStatusText(order.order_status),
+        const response = await getDeletedCustomersRequest();
+        const formattedCustomers = response.data.Data.map((customer) => ({
+          ...customer,
+          deleted_at: formatDate(customer.deleted_at), 
+          updated_at: formatDate(customer.updated_at),
         }));
-        setOrders(formattedOrders);
+        setCustomers(formattedCustomers);
       } catch (error) {
         console.log(error);
       }
     };
   
-    fetchOrders();
+    fetchCustomers();
   }, []);
-
-  const getOrderStatusText = (orderStatus) => {
-    switch (orderStatus) {
-      case 1:
-        return 'En proceso';
-      case 2:
-        return 'Completada';
-      case 3:
-        return 'Anulada';
-      default:
-        return '';
-    }
-  };
 
   const handleSort = (event, id) => {
     const isAsc = customerBy === id && order === 'asc';
@@ -96,18 +81,18 @@ export default function OrdersPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = orders.map((n) => n.created_at);
+      const newSelecteds = customers.map((n) => n.deleted_at);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, created_at) => {
-    const selectedIndex = selected.indexOf(created_at);
+  const handleClick = (event, deleted_at) => {
+    const selectedIndex = selected.indexOf(deleted_at);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, created_at);
+      newSelected = newSelected.concat(selected, deleted_at);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -136,7 +121,7 @@ export default function OrdersPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: orders,
+    inputData: customers,
     comparator: getComparator(order, customerBy),
     filterDocument,
   });
@@ -146,21 +131,22 @@ export default function OrdersPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} gap={2}>
-        <Typography variant="h4">Servicios</Typography>
+        <Typography variant="h4">Clientes eliminados</Typography>
 
         <Stack direction="row" spacing={1} alignItems="center" mr={-1}>
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/servicios/crear")}>
-            Registrar
-          </Button>
-
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="ph:trash-fill" />} onClick={() => navigate("/servicios/papelera")}>
-            Papelera
+          <Button 
+          variant="contained"
+          color="inherit" 
+          startIcon={<Iconify icon="ph:list-fill" />}
+          onClick={() => navigate("/clientes")}
+          >
+            Listado
           </Button>
         </Stack>
       </Stack>
 
       <Card>
-        <OrdersTableToolbar
+        <CustomersTableToolbar
           numSelected={selected.length}
           filterDocument={filterDocument}
           onFilterDocument={handleFilterByDocument}
@@ -172,40 +158,42 @@ export default function OrdersPage() {
               <OrderTableHead
                 order={order}
                 orderBy={customerBy}
-                rowCount={orders.length}
+                rowCount={customers.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'created_at', label: 'Fecha de creación' },
-                  { id: 'number', label: 'Número' },
-                  { id: 'customer_id', label: 'Cliente' },
-                  { id: 'receipt_date', label: 'Fecha de recepción' },
-                  { id: 'user_id', label: 'Recibido por' },
-                  { id: 'order_status', label: 'Estatus' },
+                  { id: 'deleted_at', label: 'Fecha de eliminación' },
+                  { id: 'document_type', label: 'Documento' },
+                  { id: 'first_name', label: 'Nombre' },
+                  { id: 'last_name', label: 'Apellido' },
+                  { id: 'phone', label: 'Teléfono' },
+                  { id: 'email', label: 'Correo electrónico' },
+                  { id: 'role', label: '' },
                 ]}
               />
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <OrdersTableRow
+                    <CustomersTableRowTrash
                       key={row.id}
                       id={row.id}
-                      created_at={row.created_at}
-                      number={row.number}
-                      customer_id={row.customer_id}
-                      receipt_date={row.receipt_date}
-                      user_id={row.user_id}
-                      order_status={row.order_status}
-                      selected={selected.indexOf(row.created_at) !== -1}
-                      handleClick={(event) => handleClick(event, row.created_at)}
+                      deleted_at={row.deleted_at}
+                      document_type={row.document_type}
+                      document_number={row.document_number}
+                      first_name={row.first_name}
+                      last_name={row.last_name}
+                      phone={row.phone}
+                      email={row.email}
+                      selected={selected.indexOf(row.deleted_at) !== -1}
+                      handleClick={(event) => handleClick(event, row.deleted_at)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, orders.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, customers.length)}
                 />
 
                 {notFound && <TableNoData query={filterDocument} />}
@@ -217,7 +205,7 @@ export default function OrdersPage() {
         <TablePagination
           page={page}
           component="div"
-          count={orders.length}
+          count={customers.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

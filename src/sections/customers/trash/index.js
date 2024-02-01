@@ -1,0 +1,1 @@
+export { default as CustomersTrashView } from './customer-view-trash';

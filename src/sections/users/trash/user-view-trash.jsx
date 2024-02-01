@@ -21,8 +21,8 @@ import OrderTableHead from 'src/sections/table-head';
 import TableEmptyRows from 'src/sections/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from 'src/sections/order/utils';
 
-import UsersTableRowTrash from '../users-table-row-trash';
 import UsersTableToolbar from '../users-table-toolbar';
+import UsersTableRowTrash from '../users-table-row-trash';
 
 // ----------------------------------------------------------------------
 

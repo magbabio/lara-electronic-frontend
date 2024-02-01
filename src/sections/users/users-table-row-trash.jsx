@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
@@ -9,12 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 
-import AlertDialog from 'src/components/AlertDialog';
-import LoadingBackdrop from 'src/utils/loading';
-import { activateUserRequest } from 'src/services/user/userAPI';
 import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
+import { activateUserRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
+import AlertDialog from 'src/components/AlertDialog';
 
 // ----------------------------------------------------------------------
 
@@ -31,15 +31,13 @@ export default function UsersTableRowTrash({
   handleClick,
 }) {
 
-  const navigate = useNavigate();
-
   const [open, setOpen] = useState(null);
 
   // Selected user
 
-  const [selectedUserDocument, setSelectedUserDocument] = useState('');
+  // const [selectedUserDocument, setSelectedUserDocument] = useState('');
   const [selectedUserName, setSelectedUserName] = useState('');
-  const [selectedUserEmail, setSelectedUserEmail] = useState('');
+  // const [selectedUserEmail, setSelectedUserEmail] = useState('');
  
   // Messages
 
@@ -63,9 +61,9 @@ export default function UsersTableRowTrash({
   };
 
   const handleOpenActivate = () => {
-    setSelectedUserDocument(id);
+    // setSelectedUserDocument(id);
     setSelectedUserName(`${first_name} ${last_name}`);
-    setSelectedUserEmail(email);
+    // setSelectedUserEmail(email);
     setOpenAlertDialog(true);
   }
 

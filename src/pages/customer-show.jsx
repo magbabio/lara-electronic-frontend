@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { LoginView } from 'src/sections/login';
+import CustomerShow from 'src/sections/customers/show/customers-show';
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> Iniciar Sesión | Lara Electrónica </title>
+        <title> Clientes | Lara Electrónica </title>
       </Helmet>
 
-      <LoginView />
+      <CustomerShow />
     </>
   );
 }
