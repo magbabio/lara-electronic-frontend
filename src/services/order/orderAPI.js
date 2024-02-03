@@ -23,3 +23,6 @@ export const activateOrderRequest = id => http.put(`${API}/orders/activate/${id}
 
 export const generateOrderDocumentRequest = id => 
     http.get(`${API}/orders/generateOrderDocument/${id}`, { responseType: 'blob' });
+
+export const sendOrderEmailRequest = id => 
+    http.get(`${API}/orders/sendOrderEmail/${id}`);
