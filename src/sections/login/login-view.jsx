@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
@@ -17,6 +19,11 @@ import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
+import { useAuth } from 'src/context/AuthContext';
+
+import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
@@ -29,14 +36,57 @@ export default function LoginView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleClick = () => {
-    router.push('/dashboard');
-  };
+  const navigate = useNavigate();
+
+  const { register, handleSubmit } = useForm();
+
+  const { signin, isAuthenticated } = useAuth();
+
+  // Loader
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Description alert
+  
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (isAuthenticated) navigate('/')
+  }, [isAuthenticated])
+
+  const onSubmit = handleSubmit(async (data) => {
+    setErrorMessage('');
+    setSuccessMessage(''); 
+    setIsLoading(true);
+    try {
+      const response = await signin(data);
+      console.log(response);
+      // setSuccessMessage(message);
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
+  });
 
   const renderForm = (
-    <>
+    <>    
+      <form onSubmit={onSubmit} > 
+      {successMessage && (
+        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
+      )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )}
+      <LoadingBackdrop isLoading={isLoading} />        
       <Stack spacing={3}>
-        <TextField name="email" label="Correo electrónico" />
+        <TextField 
+          name="email" 
+          label="Correo electrónico"
+          {...register("email")} 
+        />
 
         <TextField
           name="password"
@@ -51,13 +101,14 @@ export default function LoginView() {
               </InputAdornment>
             ),
           }}
+          {...register("password")} 
         />
-      </Stack>
+      </Stack>     
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
+        {/* <Link variant="subtitle2" underline="hover">
           Olvidó su contraseña?
-        </Link>
+        </Link> */}
       </Stack>
 
       <LoadingButton
@@ -66,10 +117,10 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
       >
         Iniciar sesión
       </LoadingButton>
+      </form>  
     </>
   );
 
@@ -83,13 +134,14 @@ export default function LoginView() {
         height: 1,
       }}
     >
+      
       <Logo
         sx={{
           position: 'fixed',
           top: { xs: 16, md: 24 },
           left: { xs: 16, md: 24 },
         }}
-      />
+      />     
 
       <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
         <Card
@@ -106,7 +158,7 @@ export default function LoginView() {
           </Typography>
 
           <Divider sx={{ my: 3 }}/>
-
+        
           {renderForm}
         </Card>
       </Stack>

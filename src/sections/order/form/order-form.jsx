@@ -238,12 +238,12 @@ export default function OrderForm() {
       const formattedDate = dayjs(data.receipt_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
       data.receipt_date = formattedDate;
       try {
+        setIsLoading(true);
         const response = await updateOrderRequest(params.id,data);
         const responseData = response.data;
         const message = responseData.Message;
         setSuccessMessage(message);
       } catch (error) {
-        console.log(error);
         const message = error.response.data.Message;
         setErrorMessage(message);
       } finally {

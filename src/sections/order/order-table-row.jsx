@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 
-import { deleteOrderRequest, generateOrderDocumentRequest } from 'src/services/order/orderAPI';
+import { deleteOrderRequest, generateOrderDocumentRequest, sendOrderEmailRequest } from 'src/services/order/orderAPI';
 import { getCustomersRequest } from 'src/services/customer/customerAPI';
 import { getUsersRequest } from 'src/services/user/userAPI';
 
@@ -91,6 +91,7 @@ export default function OrdersTableRow({
   // Delete user
 
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [openSendAlertDialog, setOpenSendAlertDialog] = useState(false);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -152,6 +153,28 @@ export default function OrdersTableRow({
     }
   };
 
+  const handleSendClick = async () => {
+    setErrorMessage('');
+    setSuccessMessage(''); 
+    try {
+      setOpenSendAlertDialog(false); 
+      setIsLoading(true);
+      const response = await sendOrderEmailRequest(id);
+      const message = response.data.Message;
+      setSuccessMessage(message);
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);   
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleClickOpenSend = () => {
+    setSelectedOrderNumber(number);
+    setOpenSendAlertDialog(true);
+  };
+
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -180,10 +203,12 @@ export default function OrdersTableRow({
             </IconButton>
           </Tooltip>
         </TableCell>
-
+        
         <TableCell>
           <Tooltip title="Enviar a cliente" placement="top">
-           <Iconify icon="material-symbols:stacked-email-outline-rounded"/>
+            <IconButton onClick={() => handleClickOpenSend()} style={{ cursor: 'pointer' }}>
+              <Iconify icon="material-symbols:stacked-email-outline-rounded"/>
+            </IconButton>
           </Tooltip>
         </TableCell>
         
@@ -230,6 +255,15 @@ export default function OrdersTableRow({
         name={selectedOrderNumber}
         action="Eliminar"                  
       />
+      <AlertDialog
+        openAlertDialog={openSendAlertDialog}
+        onClose={() => setOpenSendAlertDialog(false)}
+        onActionClick={handleSendClick} 
+        title="Enviar a cliente"
+        description="¿Está seguro que desea enviar la orden de servicio al cliente?"
+        name={`Orden de servicio N° ${selectedOrderNumber} del cliente ${customerFirstName} ${customerLastName}`}
+        action="Enviar"
+      />      
       {successMessage && (
         <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
       )}
