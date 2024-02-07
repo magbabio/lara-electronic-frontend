@@ -32,7 +32,7 @@ export default function Header({ onOpenNav }) {
         </IconButton>
       )}
 
-      <Searchbar />
+      {/* <Searchbar /> */}
 
       <Box sx={{ flexGrow: 1 }} />
 

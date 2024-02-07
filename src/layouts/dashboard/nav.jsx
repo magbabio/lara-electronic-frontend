@@ -16,6 +16,7 @@ import { RouterLink } from 'src/routes/components';
 import { useResponsive } from 'src/hooks/use-responsive';
 
 import { account } from 'src/_mock/account';
+import { useAuth } from 'src/context/AuthContext';
 
 import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
@@ -27,6 +28,8 @@ import navConfig from './config-navigation';
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
+
+  const { user } = useAuth();
 
   const upLg = useResponsive('up', 'lg');
 
@@ -53,10 +56,10 @@ export default function Nav({ openNav, onCloseNav }) {
       <Avatar src={account.photoURL} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.displayName}</Typography>
+        <Typography variant="subtitle2">{user.first_name} {user.last_name}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
+          {user.role}
         </Typography>
       </Box>
     </Box>

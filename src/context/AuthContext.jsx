@@ -20,7 +20,7 @@ export const AuthProvider = ({children}) => {
   const signin = async (user) => {
     try {
         const res = await loginRequest(user);
-        setUser(res.data);
+        setUser(res.data.Data);
         setIsAuthenticated(true);
         return res;
     } catch (error) {
