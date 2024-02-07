@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
 
 import DashboardLayout from 'src/layouts/dashboard';
 
@@ -31,9 +32,9 @@ export default function Router() {
     {
       element: (
         <DashboardLayout>
-          <Suspense>
+          <ProtectedRoute>
             <Outlet />
-          </Suspense>
+          </ProtectedRoute>
         </DashboardLayout>
       ),
       children: [

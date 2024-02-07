@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Cookies from "js-cookie";
 
+import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
@@ -17,6 +20,11 @@ import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
+import { loginRequest, verifyTokenRequest } from 'src/services/authAPI';
+
+import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
@@ -29,12 +37,69 @@ export default function LoginView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigate = useNavigate();
+
+  
+  const { register, handleSubmit, setValue, control } = useForm();
+
+  // Loader
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Description alert
+  
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Is authenticated
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const token = Cookies.get('token');
+      const isAuthenticated = Boolean(token);
+  
+      if (isAuthenticated) {
+        try {
+          const res = await verifyTokenRequest(token);
+          setIsAuthenticated(Boolean(res.data.Data));
+          navigate('/servicios')
+        } catch (error) {
+          setIsAuthenticated(false);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+  
+    checkLogin();
+  }, []);
+
+  const onSubmit = handleSubmit(async (data) => {
+    setErrorMessage('');
+    setSuccessMessage(''); 
+    try {
+      setIsLoading(true);
+      const response = await loginRequest(data);
+      const responseData = response.data;
+      const message = responseData.Message;
+      setSuccessMessage(message);
+    } catch (error) {
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
+  });
+
   const handleClick = () => {
     router.push('/dashboard');
   };
 
   const renderForm = (
     <>
+      <form onSubmit={onSubmit} > 
       <Stack spacing={3}>
         <TextField name="email" label="Correo electrónico" />
 
@@ -70,6 +135,7 @@ export default function LoginView() {
       >
         Iniciar sesión
       </LoadingButton>
+      </form>
     </>
   );
 
