@@ -19,9 +19,17 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl'
 // import CircularProgress from '@mui/material/CircularProgress'
 
-import { OnlyNumber } from 'src/utils/masks';
+import { OnlyNumber, Phone } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
+
+import { valDocumentNumber, 
+  valFirstName,
+  valLastName,
+  valPhone,
+  valEmail,
+  valAddress
+} from 'src/utils/validations/userSchema';
 
 import { getCustomerRequest, createCustomerRequest, updateCustomerRequest } from 'src/services/customer/customerAPI';
 
@@ -57,6 +65,8 @@ export default function CustomerForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [errors, setErrors] = useState({});
+
   // Load customer
 
   useEffect(() => {
@@ -87,12 +97,38 @@ export default function CustomerForm() {
 
   // Submit data methods
   const onSubmit = handleSubmit(async (data) => {
-    setIsLoading(true);
+
     setErrorMessage('');
-    setSuccessMessage('');  
+    setSuccessMessage(''); 
+    
+    const documentNumberError = valDocumentNumber(data.document_number);
+    const firstNameError = valFirstName(data.first_name);
+    const lastNameError = valLastName(data.last_name);
+    //const addressError = valAddress(data.address);
+    const phoneError = valPhone(data.phone);
+    const emailError = valEmail(data.email);
+
+    if ( documentNumberError,
+      firstNameError,
+      lastNameError,
+      // addressError
+      phoneError,
+      emailError
+      ) {
+      setErrors({
+        document_number: documentNumberError,
+        first_name: firstNameError,
+        last_name: lastNameError,
+        // address: addressError
+        phone: phoneError,
+        email: emailError
+      });
+      return; 
+    }
 
     if (params.id) {
       try {
+        setIsLoading(true);
         const response = await updateCustomerRequest(params.id,data);
         const responseData = response.data;
         const message = responseData.Message;
@@ -119,6 +155,7 @@ export default function CustomerForm() {
         }, 2000);
     
       } catch (error) {
+        console.log(error);
         const message = error.response.data.Message;
         setErrorMessage(message);
       } finally {
@@ -201,6 +238,8 @@ export default function CustomerForm() {
                     }}
                     onChange={(e) => field.onChange(e.target.value)}
                     {...register("document_number")}
+                    error={!!errors.document_number} 
+                    helperText={errors.document_number} 
                   />
                 )}
               />
@@ -217,6 +256,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Nombre"
                     id="first_name"
+                    {...register("first_name")} 
+                    error={!!errors.first_name} 
+                    helperText={errors.first_name} 
                   />
                 )}
               />
@@ -234,6 +276,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Apellido"
                     id="last_name"
+                    {...register("last_name")} 
+                    error={!!errors.last_name} 
+                    helperText={errors.last_name} 
                   />
                 )}
               />
@@ -251,6 +296,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Dirección"
                     id="address"
+                    {...register("address")} 
+                    error={!!errors.address} 
+                    helperText={errors.address} 
                   />
                 )}
               />
@@ -268,6 +316,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Teléfono"
                     id="phone"
+                    {...register("phone")} 
+                    error={!!errors.phone} 
+                    helperText={errors.phone} 
                   />
                 )}
               />
@@ -285,6 +336,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Correo electrónico"
                     id="email"
+                    {...register("email")} 
+                    error={!!errors.email} 
+                    helperText={errors.email} 
                   />
                 )}
               />

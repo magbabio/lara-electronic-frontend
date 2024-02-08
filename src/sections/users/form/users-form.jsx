@@ -159,7 +159,6 @@ export default function UserForm() {
         }, 2000);
     
       } catch (error) {
-        console.log(error);
         const message = error.response.data.Message;
         setErrorMessage(message);
       } finally {
