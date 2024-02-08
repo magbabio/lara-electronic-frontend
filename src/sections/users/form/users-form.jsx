@@ -17,11 +17,18 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl'
+import InputAdornment from '@mui/material/InputAdornment'
+import IconButton from '@mui/material/IconButton'
 // import CircularProgress from '@mui/material/CircularProgress'
 
-import { OnlyNumber } from 'src/utils/masks';
+import { OnlyNumber, Phone } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
+import { valDocumentNumber, 
+        valFirstName,
+        valLastName,
+        valPhone,
+        valEmail } from 'src/utils/validations/userSchema';
 
 import { getUserRequest, createUserRequest, updateUserRequest } from 'src/services/user/userAPI';
 
@@ -58,18 +65,20 @@ export default function UserForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [errors, setErrors] = useState({});
+
   // Password methods
 
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // const togglePasswordVisibility = () => {
-  //   setShowPassword((prevState) => !prevState);
-  // };
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
+  };
 
-  // const toggleConfirmPasswordVisibility = () => {
-  //   setShowConfirmPassword((prevState) => !prevState);
-  // };
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prevState) => !prevState);
+  };
 
   // Load user
 
@@ -100,12 +109,30 @@ export default function UserForm() {
 
   // Submit data methods
   const onSubmit = handleSubmit(async (data) => {
-    setIsLoading(true);
+
     setErrorMessage('');
     setSuccessMessage('');  
 
+    const documentNumberError = valDocumentNumber(data.document_number);
+    const firstNameError = valFirstName(data.first_name);
+    const lastNameError = valLastName(data.last_name);
+    const phoneError = valPhone(data.phone);
+    const emailError = valEmail(data.email);
+
+    if ( documentNumberError, firstNameError, lastNameError, phoneError, emailError ) {
+      setErrors({
+        document_number: documentNumberError,
+        first_name: firstNameError,
+        last_name: lastNameError,
+        phone: phoneError,
+        email: emailError
+      });
+      return; 
+    }
+
     if (params.id) {
       try {
+        setIsLoading(true);
         const response = await updateUserRequest(params.id,data);
         const responseData = response.data;
         const message = responseData.Message;
@@ -132,6 +159,7 @@ export default function UserForm() {
         }, 2000);
     
       } catch (error) {
+        console.log(error);
         const message = error.response.data.Message;
         setErrorMessage(message);
       } finally {
@@ -214,6 +242,8 @@ export default function UserForm() {
                     }}
                     onChange={(e) => field.onChange(e.target.value)}
                     {...register("document_number")}
+                    error={!!errors.document_number} 
+                    helperText={errors.document_number} 
                   />
                 )}
               />
@@ -230,6 +260,9 @@ export default function UserForm() {
                     fullWidth
                     label="Nombre"
                     id="first_name"
+                    {...register("first_name")} 
+                    error={!!errors.first_name} 
+                    helperText={errors.first_name} 
                   />
                 )}
               />
@@ -247,6 +280,9 @@ export default function UserForm() {
                     fullWidth
                     label="Apellido"
                     id="last_name"
+                    {...register("last_name")} 
+                    error={!!errors.last_name} 
+                    helperText={errors.last_name} 
                   />
                 )}
               />
@@ -264,6 +300,12 @@ export default function UserForm() {
                     fullWidth
                     label="Teléfono"
                     id="phone"
+                    InputProps={{
+                      inputComponent: Phone
+                    }}
+                    {...register("phone")} 
+                    error={!!errors.phone} 
+                    helperText={errors.phone} 
                   />
                 )}
               />
@@ -281,6 +323,9 @@ export default function UserForm() {
                     fullWidth
                     label="Correo electrónico"
                     id="email"
+                    {...register("email")} 
+                    error={!!errors.email} 
+                    helperText={errors.email} 
                   />
                 )}
               />
@@ -305,7 +350,7 @@ export default function UserForm() {
                 />
               </FormControl>
             </Grid>    
-            {/* <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={6} md={6}>
               <Controller
                 name="password"
                 control={control}
@@ -336,7 +381,7 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <Controller
-                name="confirm_password"
+                name="confirmPassword"
                 control={control}
                 render={({ field }) => (
                   <TextField
@@ -344,7 +389,7 @@ export default function UserForm() {
                     required
                     fullWidth
                     label="Repetir contraseña"
-                    id="confirm_password"
+                    id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     InputProps={{
                       endAdornment: (
@@ -362,7 +407,7 @@ export default function UserForm() {
                   />
                 )}
               />
-            </Grid>                      */}
+            </Grid>                      
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid>               
