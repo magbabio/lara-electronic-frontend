@@ -21,14 +21,16 @@ import FormControl from '@mui/material/FormControl'
 import InputAdornment from '@mui/material/InputAdornment'
 // import CircularProgress from '@mui/material/CircularProgress'
 
-import { OnlyNumber, Phone } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
-import { valDocumentNumber, 
-        valFirstName,
-        valLastName,
-        valPhone,
-        valEmail } from 'src/utils/validations/userSchema';
+import { Phone, OnlyNumber } from 'src/utils/masks';
+import { 
+  valPhone,
+  valEmail,
+  valLastName,
+  valFirstName,
+  valDocumentNumber,       
+ } from 'src/utils/validations/userSchema';
 
 import { getUserRequest, createUserRequest, updateUserRequest } from 'src/services/user/userAPI';
 

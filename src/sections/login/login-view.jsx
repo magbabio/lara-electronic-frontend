@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -15,26 +13,20 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from 'src/routes/hooks';
-
-import { bgGradient } from 'src/theme/css';
-
-import { useAuth } from 'src/context/AuthContext';
-
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
+import { valEmail } from 'src/utils/validations/userSchema';
+
+import { bgGradient } from 'src/theme/css';
+import { useAuth } from 'src/context/AuthContext';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
-
-import { valEmail } from 'src/utils/validations/userSchema';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
   const theme = useTheme();
-
-  const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
 

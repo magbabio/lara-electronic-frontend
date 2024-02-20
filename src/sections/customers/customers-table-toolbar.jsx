@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
 import PropTypes from 'prop-types';
-import { searchCustomerByName } from 'src/services/customer/customerAPI';
-import Tooltip from '@mui/material/Tooltip';
+import React, { useState, useEffect } from 'react';
+
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
+
+import DescriptionAlert from 'src/utils/alert';
+import LoadingBackdrop from 'src/utils/loading';
+
+import { searchCustomerByName } from 'src/services/customer/customerAPI';
 
 import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function CustomersTableToolbar({ numSelected, onSearchResults }) {
+export default function CustomersTableToolbar({ numSelected, onSearchResults, onSearchTerm }) {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -29,13 +33,12 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults }) 
   };
 
   const handleSearch = async (event) => {
+    setErrorMessage('');
     const { value } = event.target;
     setSearchTerm(value);
+    onSearchTerm(value);
     try {
-      if (value === '') {
-        setSearchResults([]); // Restaura los resultados de búsqueda
-        onSearchResults([]); // Llama a la función de devolución de llamada con el vector vacío
-      } else {
+      setIsLoading(true);
         const response = await searchCustomerByName(value);
         const formattedCustomers = response.data.Data.map((customer) => ({
           ...customer,
@@ -44,9 +47,11 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults }) 
         }));
         setSearchResults(formattedCustomers);
         onSearchResults(formattedCustomers);
-      }
     } catch (error) {
-      console.error(error);
+      const message = error.response.data.Message;
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,6 +94,10 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults }) 
           }
         />
       )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )}
+      <LoadingBackdrop isLoading={isLoading} />
     </Toolbar>
   );
 }
@@ -96,4 +105,5 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults }) 
 CustomersTableToolbar.propTypes = {
   numSelected: PropTypes.number,
   onSearchResults: PropTypes.func,
+  onSearchTerm: PropTypes.string
 };

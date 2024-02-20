@@ -1,9 +1,9 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
-import {useDropzone} from 'react-dropzone'
+//import {useDropzone} from 'react-dropzone'
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -25,10 +25,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 import { OrderNumber, DocumentNumber } from 'src/utils/masks';
-import { valOrderNumber,
+import { 
         valReceiptDate
 } from 'src/utils/validations/orderSchema';
-import { valDocumentNumber } from 'src/utils/validations/userSchema';
 
 import { getUsersRequest } from 'src/services/user/userAPI';
 import { getCustomerByDocumentRequest } from 'src/services/customer/customerAPI';
@@ -208,11 +207,11 @@ export default function OrderForm() {
 
   // Dropzone methods
 
-  const onDrop = useCallback(acceptedFiles => {
-    console.log(acceptedFiles[0]);
-    // Do something with the files
-  }, [])
-  const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
+  // const onDrop = useCallback(acceptedFiles => {
+  //   console.log(acceptedFiles[0]);
+  //   // Do something with the files
+  // }, [])
+  // const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
 
 
   // Submit data methods

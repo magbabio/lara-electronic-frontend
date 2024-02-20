@@ -20,14 +20,14 @@ import FormControl from '@mui/material/FormControl'
 // import CircularProgress from '@mui/material/CircularProgress'
 
 import DescriptionAlert from 'src/utils/alert';
-import { Phone, OnlyNumber } from 'src/utils/masks';
 import LoadingBackdrop from 'src/utils/loading';
-
-import { valDocumentNumber, 
-  valFirstName,
-  valLastName,
+import { Phone, OnlyNumber } from 'src/utils/masks';
+import { 
   valPhone,
   valEmail,
+  valLastName,
+  valFirstName,
+  valDocumentNumber, 
 } from 'src/utils/validations/userSchema';
 
 import { getCustomerRequest, createCustomerRequest, updateCustomerRequest } from 'src/services/customer/customerAPI';

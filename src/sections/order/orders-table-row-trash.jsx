@@ -188,7 +188,6 @@ OrdersTableRowTrash.propTypes = {
   number: PropTypes.string,
   customer_id: PropTypes.string,
   user_id: PropTypes.string,
-  customerFirstName: PropTypes.string,
   receipt_date: PropTypes.string,
   order_status: PropTypes.any,
   selected: PropTypes.any,
