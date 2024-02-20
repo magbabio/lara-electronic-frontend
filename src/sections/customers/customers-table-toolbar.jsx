@@ -57,8 +57,8 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults, on
 
   useEffect(() => {
     if (searchTerm === '') {
-      setSearchResults([]); // Restaura los resultados de búsqueda
-      onSearchResults([]); // Llama a la función de devolución de llamada con el vector vacío
+      setSearchResults([]); 
+      onSearchResults([]);
     }
   }, [searchTerm]);
 

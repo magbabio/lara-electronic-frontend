@@ -15,14 +15,17 @@ export const getDeletedOrdersRequest = async () =>
   http.get(`${API}/orders/getAllDeleted`);
 
 export const updateOrderRequest = (id, order) => 
-      http.put(`${API}/orders/update/${id}`, order);
+  http.put(`${API}/orders/update/${id}`, order);
 
 export const deleteOrderRequest = id => http.delete(`${API}/orders/delete/${id}`);
 
 export const activateOrderRequest = id => http.put(`${API}/orders/activate/${id}`);
 
 export const generateOrderDocumentRequest = id => 
-    http.get(`${API}/orders/generateOrderDocument/${id}`, { responseType: 'blob' });
+  http.get(`${API}/orders/generateOrderDocument/${id}`, { responseType: 'blob' });
 
 export const sendOrderEmailRequest = id => 
-    http.get(`${API}/orders/sendOrderEmail/${id}`);
+  http.get(`${API}/orders/sendOrderEmail/${id}`);
+
+export const searchOrderByEquipmentSerial = (serial) => 
+  http.get(`${API}/orders/searchOrderByEquipmentSerial/${serial}/`);

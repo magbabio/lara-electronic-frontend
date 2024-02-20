@@ -40,9 +40,11 @@ export default function OrdersPage() {
 
   const [customerBy, setCustomerBy] = useState('created_at');
 
-  const [filterDocument, setFilterDocument] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [searchTerm, setSearchTerm] = useState('');
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -130,18 +132,17 @@ export default function OrdersPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByDocument = (event) => {
-    setPage(0);
-    setFilterDocument(event.target.value);
+  const handleSearchResults = (results) => {
+    setSearchResults(results);
   };
 
-  const dataFiltered = applyFilter({
-    inputData: orders,
-    comparator: getComparator(order, customerBy),
-    filterDocument,
-  });
+  const handleSearchTerm = (value) => {
+    setSearchTerm(value);
+  };
+  
+  const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const notFound = !dataFiltered.length && !!filterDocument;
+  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : orders);
 
   return (
     <Container>
@@ -162,8 +163,8 @@ export default function OrdersPage() {
       <Card>
         <OrdersTableToolbar
           numSelected={selected.length}
-          filterDocument={filterDocument}
-          onFilterDocument={handleFilterByDocument}
+          onSearchResults={handleSearchResults}
+          onSearchTerm={handleSearchTerm}
         />
 
         <Scrollbar>
@@ -208,7 +209,7 @@ export default function OrdersPage() {
                   emptyRows={emptyRows(page, rowsPerPage, orders.length)}
                 />
 
-                {notFound && <TableNoData query={filterDocument} />}
+            {notFound && <TableNoData query={searchTerm} />}
               </TableBody>
             </Table>
           </TableContainer>
