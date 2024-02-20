@@ -1,9 +1,9 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
-import {useDropzone} from 'react-dropzone'
-import { useParams, useNavigate } from 'react-router-dom';
+//import {useDropzone} from 'react-dropzone'
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -23,9 +23,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import DescriptionAlert from 'src/utils/alert';
-import { DocumentNumber, OrderNumber } from 'src/utils/masks';
 import LoadingBackdrop from 'src/utils/loading';
-import { valOrderNumber,
+import { OrderNumber, DocumentNumber } from 'src/utils/masks';
+import { 
         valReceiptDate
 } from 'src/utils/validations/orderSchema';
 
@@ -66,7 +66,6 @@ export default function OrderForm() {
         try {
           setIsLoading(true); 
           const response = await getOrderRequest(params.id);
-          console.log(response);
           const convertedDate = dayjs(response.data.Data.receipt_date).format('DD/MM/YYYY');
           setValue('receipt_date',convertedDate)
           setValue('number', response.data.Data.number);
@@ -88,6 +87,7 @@ export default function OrderForm() {
               model: item.model,
               serial: item.serial,
               repair_concept: item.repair_concept,
+              //repair_cost: item.repair_cost,
               equipment_status: item.equipment_status,
               observations: item.observations,
               arrived_image: null
@@ -179,6 +179,7 @@ export default function OrderForm() {
       serial: "",
       repair_concept: "",
       equipment_status: 1,
+      //repair_cost: "",
       observations: "",
       arrived_image: null
     };
@@ -206,11 +207,11 @@ export default function OrderForm() {
 
   // Dropzone methods
 
-  const onDrop = useCallback(acceptedFiles => {
-    console.log(acceptedFiles[0]);
-    // Do something with the files
-  }, [])
-  const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
+  // const onDrop = useCallback(acceptedFiles => {
+  //   console.log(acceptedFiles[0]);
+  //   // Do something with the files
+  // }, [])
+  // const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
 
 
   // Submit data methods
@@ -220,16 +221,21 @@ export default function OrderForm() {
     setErrorMessage('');
     setSuccessMessage(''); 
 
-    const orderNumberError = valOrderNumber(data.number);
-    const receiptDateError = valReceiptDate(data.receipt_date);
+    // const orderNumberError = valOrderNumber(data.number);
+    // const receiptDateError = valReceiptDate(data.receipt_date);
+    // const documentNumberError = valDocumentNumber(data.document_number);
 
-    if ( orderNumberError ) {
-      setErrors({
-        number: orderNumberError,
-        receipt_date: receiptDateError,
-      });
-      return; 
-    }
+    // if ( orderNumberError, 
+    //   receiptDateError, 
+    //   documentNumberError 
+    //   ) {
+    //   setErrors({
+    //     number: orderNumberError,
+    //     receipt_date: receiptDateError,
+    //     document_number: documentNumberError
+    //   });
+    //   return; 
+    // }
 
     data.equipment = equipment;
     data.company_id = 1; // Esto hay que cambiarlo después idk
@@ -243,6 +249,9 @@ export default function OrderForm() {
         const responseData = response.data;
         const message = responseData.Message;
         setSuccessMessage(message);
+        setTimeout(() => {
+          navigate('/servicios');
+        }, 2000);
       } catch (error) {
         const message = error.response.data.Message;
         setErrorMessage(message);
@@ -258,7 +267,11 @@ export default function OrderForm() {
         const responseData = response.data;
         const message = responseData.Message;
         setSuccessMessage(message);
+        setTimeout(() => {
+          navigate('/servicios');
+        }, 2000);
       } catch (error) {
+        console.log(error);
         const message = error.response.data.Message;
         setErrorMessage(message);
       } finally {
@@ -627,7 +640,7 @@ export default function OrderForm() {
                 <Grid item xs={12} sm={6} md={6}>
                   <TextField
                     required
-                    label="Concepto de reparación"
+                    label="Falla del equipo"
                     fullWidth
                     value={item.repair_concept}
                     onChange={(e) => handleInputChange(index, 'repair_concept', e.target.value)}
@@ -649,6 +662,22 @@ export default function OrderForm() {
                     </Select>
                   </FormControl>
                 </Grid>
+
+                {/* {params.id && (
+                <>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    required
+                    label="Costo de reparación"
+                    fullWidth
+                    value={item.repair_cost}
+                    onChange={(e) => handleInputChange(index, 'repair_cost', e.target.value)}
+                  />
+                </Grid>    
+                        
+                </>
+                )} */}
+
                 <Grid item xs={12} sm={12} md={12}>
                   <TextField
                     required

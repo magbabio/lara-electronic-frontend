@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 // ----------------------------------------------------------------------
 
-export default function TableNoData({ query }) {
+export default function TableNoData({ searchTerm }) {
   return (
     <TableRow>
       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -21,9 +21,9 @@ export default function TableNoData({ query }) {
           </Typography>
 
           <Typography variant="body2">
-            No se han encontrado resultados para &nbsp;
-            <strong>&quot;{query}&quot;</strong>.
-            <br /> .
+            No se han encontrado resultados
+            <strong>{searchTerm}</strong>.
+            <br /> 
           </Typography>
         </Paper>
       </TableCell>
@@ -32,5 +32,5 @@ export default function TableNoData({ query }) {
 }
 
 TableNoData.propTypes = {
-  query: PropTypes.string,
+  searchTerm: PropTypes.string,
 };

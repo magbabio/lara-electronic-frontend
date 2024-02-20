@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react';
-
+import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -15,14 +13,12 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from 'src/routes/hooks';
-
-import { bgGradient } from 'src/theme/css';
-
-import { useAuth } from 'src/context/AuthContext';
-
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
+import { valEmail } from 'src/utils/validations/userSchema';
+
+import { bgGradient } from 'src/theme/css';
+import { useAuth } from 'src/context/AuthContext';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -32,8 +28,6 @@ import Iconify from 'src/components/iconify';
 export default function LoginView() {
   const theme = useTheme();
 
-  const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
@@ -41,6 +35,8 @@ export default function LoginView() {
   const { register, handleSubmit } = useForm();
 
   const { signin, isAuthenticated } = useAuth();
+
+  const [errors, setErrors] = useState({});
 
   // Loader
 
@@ -58,11 +54,16 @@ export default function LoginView() {
   const onSubmit = handleSubmit(async (data) => {
     setErrorMessage('');
     setSuccessMessage(''); 
-    setIsLoading(true);
+    const emailError = valEmail(data.email);
+    if ( emailError ) {
+      setErrors({
+        email: emailError
+      });
+      return; 
+    }
     try {
+      setIsLoading(true);
       const response = await signin(data);
-      console.log(response);
-      // setSuccessMessage(message);
     } catch (error) {
       const message = error.response.data.Message;
       setErrorMessage(message);
@@ -74,18 +75,14 @@ export default function LoginView() {
   const renderForm = (
     <>    
       <form onSubmit={onSubmit} > 
-      {successMessage && (
-        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
-      )}
-      {errorMessage && (
-        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
-      )}
       <LoadingBackdrop isLoading={isLoading} />        
       <Stack spacing={3}>
         <TextField 
           name="email" 
           label="Correo electrónico"
           {...register("email")} 
+          error={!!errors.email} 
+          helperText={errors.email} 
         />
 
         <TextField
@@ -131,7 +128,11 @@ export default function LoginView() {
           color: alpha(theme.palette.background.default, 0.9),
           imgUrl: '/assets/background/overlay_4.jpg',
         }),
-        height: 1,
+        minHeight: '100vh', // Cambia 'height' a 'minHeight'
+        position: 'relative', // Añade position: 'relative' para que el DescriptionAlert esté contenido dentro del Box
+        display: 'flex', // Añade display: 'flex' para centrar verticalmente el contenido
+        justifyContent: 'center', // Centra verticalmente el contenido
+        alignItems: 'center', 
       }}
     >
       
@@ -147,7 +148,7 @@ export default function LoginView() {
         <Card
           sx={{
             p: 5,
-            width: 1,
+            width: '100%',
             maxWidth: 420,
           }}
         >
@@ -160,7 +161,13 @@ export default function LoginView() {
           <Divider sx={{ my: 3 }}/>
         
           {renderForm}
-        </Card>
+                  {successMessage && (
+        <DescriptionAlert severity="success" title="Éxito" description={successMessage} />
+      )}
+      {errorMessage && (
+        <DescriptionAlert severity="error" title="Error" description={errorMessage} />
+      )} 
+        </Card>       
       </Stack>
     </Box>
   );

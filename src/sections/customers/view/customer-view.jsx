@@ -18,8 +18,8 @@ import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from 'src/sections/table-no-data';
 import OrderTableHead from 'src/sections/table-head';
+import { emptyRows } from 'src/sections/order/utils';
 import TableEmptyRows from 'src/sections/table-empty-rows';
-import { emptyRows, applyFilter, getComparator } from 'src/sections/order/utils';
 
 import CustomersTableRow from '../customers-table-row';
 import CustomersTableToolbar from '../customers-table-toolbar';
@@ -41,9 +41,11 @@ export default function CustomersPage() {
 
   const [customerBy, setCustomerBy] = useState('created_at');
 
-  const [filterDocument, setFilterDocument] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [searchTerm, setSearchTerm] = useState('');
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -116,18 +118,19 @@ export default function CustomersPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByDocument = (event) => {
-    setPage(0);
-    setFilterDocument(event.target.value);
+
+  const handleSearchResults = (results) => {
+    setSearchResults(results);
   };
 
-  const dataFiltered = applyFilter({
-    inputData: customers,
-    comparator: getComparator(order, customerBy),
-    filterDocument,
-  });
+  const handleSearchTerm = (value) => {
+    setSearchTerm(value);
+  };
+  
+  const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const notFound = !dataFiltered.length && !!filterDocument;
+  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : customers);
+
 
   return (
     <Container>
@@ -148,8 +151,8 @@ export default function CustomersPage() {
       <Card>
         <CustomersTableToolbar
           numSelected={selected.length}
-          filterDocument={filterDocument}
-          onFilterDocument={handleFilterByDocument}
+          onSearchResults={handleSearchResults}
+          onSearchTerm={handleSearchTerm}
         />
 
         <Scrollbar>
@@ -196,7 +199,7 @@ export default function CustomersPage() {
                   emptyRows={emptyRows(page, rowsPerPage, customers.length)}
                 />
 
-                {notFound && <TableNoData query={filterDocument} />}
+                {notFound && <TableNoData query={searchTerm} />}
               </TableBody>
             </Table>
           </TableContainer>

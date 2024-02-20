@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
@@ -11,9 +11,9 @@ import IconButton from '@mui/material/IconButton';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 
+import { getUsersRequest } from 'src/services/user/userAPI';
 import { activateOrderRequest } from 'src/services/order/orderAPI';
 import { getCustomersRequest } from 'src/services/customer/customerAPI';
-import { getUsersRequest } from 'src/services/user/userAPI';
 
 import Iconify from 'src/components/iconify';
 import AlertDialog from 'src/components/AlertDialog';
@@ -188,7 +188,6 @@ OrdersTableRowTrash.propTypes = {
   number: PropTypes.string,
   customer_id: PropTypes.string,
   user_id: PropTypes.string,
-  customerFirstName: PropTypes.string,
   receipt_date: PropTypes.string,
   order_status: PropTypes.any,
   selected: PropTypes.any,

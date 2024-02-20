@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import { account } from 'src/_mock/account';
-
 import { useAuth } from 'src/context/AuthContext';
 
 // ----------------------------------------------------------------------
@@ -31,7 +30,7 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
 
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -43,7 +42,7 @@ export default function AccountPopover() {
 
   const handleLogout = async () => {
     try {
-      const response = await logout();
+      await logout();
     } catch (error) {
       console.error(error);
     }
@@ -93,10 +92,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {user.first_name} {user.last_name}
+            {user?.first_name} {user?.last_name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user.email}
+            {user?.email}
           </Typography>
         </Box>
 

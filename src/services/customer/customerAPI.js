@@ -23,3 +23,6 @@ export const activateCustomerRequest = id => http.put(`${API}/customers/activate
 
 export const getCustomerByDocumentRequest = (document_type, document_number) => 
     http.get(`${API}/customers/getCustomerByDocument/${document_type}/${document_number}`);
+
+export const searchCustomerByName = (name) => 
+    http.get(`${API}/customers/searchCustomerByName/${name}/`);
