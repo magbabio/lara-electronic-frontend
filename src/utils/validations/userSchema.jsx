@@ -12,6 +12,7 @@ export const valDocumentNumber = (value) => {
       return 'Número de documento no debe tener más de 9 caracteres';
   }
 
+  return null;
 
 };
 

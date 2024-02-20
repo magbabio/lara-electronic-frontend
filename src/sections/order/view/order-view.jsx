@@ -183,9 +183,6 @@ export default function OrdersPage() {
                   { id: 'receipt_date', label: 'Fecha de recepción' },
                   { id: 'user_id', label: 'Recibido por' },
                   { id: 'order_status', label: 'Estatus' },
-                  { id: 'relleno' },
-                  { id: 'relleno' },
-                  { id: 'relleno' },
                 ]}
               />
               <TableBody>

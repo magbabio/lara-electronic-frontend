@@ -1,5 +1,8 @@
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
+import PropTypes from 'prop-types';
+import { searchCustomerByName } from 'src/services/customer/customerAPI';
 import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -11,7 +14,49 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function CustomersTableToolbar({ numSelected, filterDocument, onFilterDocument }) {
+export default function CustomersTableToolbar({ numSelected, onSearchResults }) {
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}-${month}-${year}`;
+  };
+
+  const handleSearch = async (event) => {
+    const { value } = event.target;
+    setSearchTerm(value);
+    try {
+      if (value === '') {
+        setSearchResults([]); // Restaura los resultados de búsqueda
+        onSearchResults([]); // Llama a la función de devolución de llamada con el vector vacío
+      } else {
+        const response = await searchCustomerByName(value);
+        const formattedCustomers = response.data.Data.map((customer) => ({
+          ...customer,
+          created_at: formatDate(customer.created_at), 
+          updated_at: formatDate(customer.updated_at),
+        }));
+        setSearchResults(formattedCustomers);
+        onSearchResults(formattedCustomers);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTerm === '') {
+      setSearchResults([]); // Restaura los resultados de búsqueda
+      onSearchResults([]); // Llama a la función de devolución de llamada con el vector vacío
+    }
+  }, [searchTerm]);
+
   return (
     <Toolbar
       sx={{
@@ -31,8 +76,8 @@ export default function CustomersTableToolbar({ numSelected, filterDocument, onF
         </Typography>
       ) : (
         <OutlinedInput
-          value={filterDocument}
-          onChange={onFilterDocument}
+          value={searchTerm}
+          onChange={handleSearch}
           placeholder="Buscar cliente..."
           startAdornment={
             <InputAdornment position="start">
@@ -44,26 +89,11 @@ export default function CustomersTableToolbar({ numSelected, filterDocument, onF
           }
         />
       )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <Iconify icon="eva:trash-2-fill" />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 }
 
 CustomersTableToolbar.propTypes = {
   numSelected: PropTypes.number,
-  filterDocument: PropTypes.string,
-  onFilterDocument: PropTypes.func,
+  onSearchResults: PropTypes.func,
 };

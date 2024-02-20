@@ -45,6 +45,8 @@ export default function CustomersPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [searchResults, setSearchResults] = useState([]);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -116,18 +118,14 @@ export default function CustomersPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByDocument = (event) => {
-    setPage(0);
-    setFilterDocument(event.target.value);
+
+  const handleSearchResults = (results) => {
+    setSearchResults(results);
   };
 
-  const dataFiltered = applyFilter({
-    inputData: customers,
-    comparator: getComparator(order, customerBy),
-    filterDocument,
-  });
-
-  const notFound = !dataFiltered.length && !!filterDocument;
+  const dataFiltered = searchResults.length > 0 ? searchResults : customers;
+  
+  const notFound = searchResults.length === 0 && filterDocument;
 
   return (
     <Container>
@@ -148,8 +146,7 @@ export default function CustomersPage() {
       <Card>
         <CustomersTableToolbar
           numSelected={selected.length}
-          filterDocument={filterDocument}
-          onFilterDocument={handleFilterByDocument}
+          onSearchResults={handleSearchResults}
         />
 
         <Scrollbar>

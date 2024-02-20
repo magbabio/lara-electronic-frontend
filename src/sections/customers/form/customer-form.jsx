@@ -19,8 +19,8 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl'
 // import CircularProgress from '@mui/material/CircularProgress'
 
-import { OnlyNumber, Phone } from 'src/utils/masks';
 import DescriptionAlert from 'src/utils/alert';
+import { Phone, OnlyNumber } from 'src/utils/masks';
 import LoadingBackdrop from 'src/utils/loading';
 
 import { valDocumentNumber, 
@@ -28,7 +28,6 @@ import { valDocumentNumber,
   valLastName,
   valPhone,
   valEmail,
-  valAddress
 } from 'src/utils/validations/userSchema';
 
 import { getCustomerRequest, createCustomerRequest, updateCustomerRequest } from 'src/services/customer/customerAPI';
@@ -316,6 +315,9 @@ export default function CustomerForm() {
                     fullWidth
                     label="Teléfono"
                     id="phone"
+                    InputProps={{
+                      inputComponent: Phone
+                    }}
                     {...register("phone")} 
                     error={!!errors.phone} 
                     helperText={errors.phone} 
