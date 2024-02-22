@@ -8,7 +8,7 @@ function ProtectedRoute() {
 
   if (loading) return null;
 
-  if (!loading && !isAuthenticated) return <Navigate to="/login" replace />;
+  // if (!loading && !isAuthenticated) return <Navigate to="/login" replace />;
 
   return <Outlet />;
 }
