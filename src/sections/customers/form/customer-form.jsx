@@ -48,6 +48,7 @@ export default function CustomerForm() {
       last_name: "",
       address: "",
       phone: "", 
+      second_phone: "",
       email: "",
       notes: "" 
     },
@@ -313,7 +314,7 @@ export default function CustomerForm() {
                     {...field}
                     required
                     fullWidth
-                    label="Teléfono"
+                    label="Teléfono 1"
                     id="phone"
                     InputProps={{
                       inputComponent: Phone
@@ -327,6 +328,28 @@ export default function CustomerForm() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>
+              <Controller
+                name="second_phone"
+                control={control}
+                defaultValue="" 
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Teléfono 2"
+                    id="second_phone"
+                    InputProps={{
+                      inputComponent: Phone
+                    }}
+                    {...register("second_phone")} 
+                    error={!!errors.phone} 
+                    helperText={errors.phone} 
+                  />
+                )}
+              />
+            </Grid>            
+
+            <Grid item xs={12} sm={12} md={12}>
               <Controller
                 name="email"
                 control={control}

@@ -322,31 +322,8 @@ export default function OrderForm() {
                 1. Datos de la orden
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
-            <Controller
-              name="number"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  required
-                  fullWidth
-                  label="Número de orden"
-                  id="number"
-                  value={field.value || ''}
-                  // InputLabelProps={{ shrink: !!field.value }}
-                  InputProps={{
-                    inputComponent: OrderNumber
-                  }}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  {...register("number")}
-                  error={!!errors.number} 
-                  helperText={errors.number}     
-                />
-              )}
-            />
-            </Grid>        
-            <Grid item xs={12} sm={6} md={6}>
+
+            <Grid item xs={12} sm={4} md={4}>
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es" dateLibInstance={dayjs}>
                 <Controller
                   name="receipt_date"
@@ -371,7 +348,7 @@ export default function OrderForm() {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={4} md={4}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
               <Controller
@@ -394,7 +371,7 @@ export default function OrderForm() {
               />
             </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={4} md={4}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Estado de la orden</InputLabel>
               <Controller
@@ -414,6 +391,26 @@ export default function OrderForm() {
                 )}
               />
             </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                multiline
+                rows={4}
+                name="observations"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    multiline
+                    rows={4}
+                    required
+                    fullWidth
+                    label="Observaciones de la orden"
+                    id="observations"
+                  />
+                )}
+              />
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
@@ -741,27 +738,6 @@ export default function OrderForm() {
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid> 
-
-            <Grid item xs={12} sm={12} md={12}>
-              <Controller
-                multiline
-                rows={4}
-                name="observations"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    multiline
-                    rows={4}
-                    required
-                    fullWidth
-                    label="Observaciones de la orden"
-                    id="observations"
-                  />
-                )}
-              />
-            </Grid>
 
             <AlertDialog 
               openAlertDialog={openAlertDialog} 

@@ -209,7 +209,7 @@ export default function CustomerShow() {
                     {...field}
                     required
                     fullWidth
-                    label="Teléfono"
+                    label="Teléfono 1"
                     id="phone"
                   />
                 )}
@@ -217,6 +217,24 @@ export default function CustomerShow() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>
+              <Controller
+                disabled
+                name="second_phone"
+                control={control}
+                defaultValue="" 
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Teléfono 2"
+                    id="second_phone"
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
               <Controller
                 disabled
                 name="email"

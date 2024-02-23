@@ -52,6 +52,7 @@ export default function LoginView() {
   }, [isAuthenticated])
 
   const onSubmit = handleSubmit(async (data) => {
+    setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage(''); 
     const emailError = valEmail(data.email);
@@ -62,8 +63,8 @@ export default function LoginView() {
       return; 
     }
     try {
-      setIsLoading(true);
       const response = await signin(data);
+      console.log(response);
     } catch (error) {
       const message = error.response.data.Message;
       setErrorMessage(message);

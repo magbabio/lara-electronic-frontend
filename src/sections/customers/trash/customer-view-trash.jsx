@@ -44,6 +44,10 @@ export default function CustomersTrashPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -115,18 +119,17 @@ export default function CustomersTrashPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByDocument = (event) => {
-    setPage(0);
-    setFilterDocument(event.target.value);
+  const handleSearchResults = (results) => {
+    setSearchResults(results);
   };
 
-  const dataFiltered = applyFilter({
-    inputData: customers,
-    comparator: getComparator(order, customerBy),
-    filterDocument,
-  });
+  const handleSearchTerm = (value) => {
+    setSearchTerm(value);
+  };
+  
+  const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const notFound = !dataFiltered.length && !!filterDocument;
+  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : customers);
 
   return (
     <Container>
@@ -148,8 +151,8 @@ export default function CustomersTrashPage() {
       <Card>
         <CustomersTableToolbar
           numSelected={selected.length}
-          filterDocument={filterDocument}
-          onFilterDocument={handleFilterByDocument}
+          onSearchResults={handleSearchResults}
+          onSearchTerm={handleSearchTerm}
         />
 
         <Scrollbar>
