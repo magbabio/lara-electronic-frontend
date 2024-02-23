@@ -81,6 +81,7 @@ export default function CustomerForm() {
           setValue('last_name', response.data.Data.last_name);
           setValue('address', response.data.Data.address);
           setValue('phone', response.data.Data.phone);
+          setValue('second_phone', response.data.Data.second_phone);
           setValue('email', response.data.Data.email);
           setValue('notes', response.data.Data.notes);
         } catch (error) {
