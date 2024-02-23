@@ -78,6 +78,7 @@ export default function OrderForm() {
           setValue('last_name', response.data.Data.Customer.last_name);
           setValue('address', response.data.Data.Customer.address);
           setValue('phone', response.data.Data.Customer.phone);
+          setValue('email', response.data.Data.Customer.email);
           const equipmentData = response.data.Data.Equipment;
           const newEquipment = equipmentData.map((item, index) => {
             return {
@@ -144,6 +145,7 @@ export default function OrderForm() {
       setValue('last_name', response.data.Data.last_name);
       setValue('address', response.data.Data.address);
       setValue('phone', response.data.Data.phone);
+      setValue('email', response.data.Data.email);
       setShowCustomerFields(true);
     } catch (error) {
       const message = error.response.data.Message;
@@ -557,6 +559,24 @@ export default function OrderForm() {
                 )}
               />
             </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                disabled
+                name="email"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Correo electrónico"
+                    id="email"
+                    {...register("email")}
+                  />
+                )}
+              />
+            </Grid>            
             <Grid item xs={0} sm={0} md={0}>
               <Controller
                 name="customer_id"
