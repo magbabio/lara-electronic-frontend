@@ -622,7 +622,7 @@ export default function OrderForm() {
                 <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   required
-                  label="Nombre"
+                  label="Equipo"
                   fullWidth
                   value={item.description}
                   onChange={(e) => handleInputChange(index, 'description', e.target.value)}
