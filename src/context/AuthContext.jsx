@@ -62,19 +62,19 @@ export const AuthProvider = ({children}) => {
         checkLogin();
       }, []);
 
-  const signin = async (userData) => {
-    const res = await loginRequest(userData);
-    setUser(res.data);
-    setIsAuthenticated(true);
-    localStorage.setItem('token', res.data.token);
-    return res;
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+      const signin = useCallback(async (userData) => {
+        const res = await loginRequest(userData);
+        setUser(res.data);
+        setIsAuthenticated(true);
+        localStorage.setItem('token', res.data.token);
+        return res;
+      }, []);
+    
+      const logout = useCallback(() => {
+        localStorage.removeItem('token');
+        setUser(null);
+        setIsAuthenticated(false);
+      }, []);
 
   const value = useMemo(() => ({
     user,
