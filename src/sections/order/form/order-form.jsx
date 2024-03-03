@@ -1,6 +1,5 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
-//import {useDropzone} from 'react-dropzone'
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -80,20 +79,17 @@ export default function OrderForm() {
           setValue('phone', response.data.Data.Customer.phone);
           setValue('email', response.data.Data.Customer.email);
           const equipmentData = response.data.Data.Equipment;
-          const newEquipment = equipmentData.map((item, index) => {
-            return {
-              key: index + 1,
-              description: item.description,
-              brand: item.brand,
-              model: item.model,
-              serial: item.serial,
-              repair_concept: item.repair_concept,
-              //repair_cost: item.repair_cost,
-              equipment_status: item.equipment_status,
-              observations: item.observations,
-              arrived_image: null
-            };
-          });
+          const newEquipment = equipmentData.map((item, index) => ({
+            key: index + 1,
+            description: item.description,
+            brand: item.brand,
+            model: item.model,
+            serial: item.serial,
+            repair_concept: item.repair_concept,
+            equipment_status: item.equipment_status,
+            observations: item.observations,
+            arrived_image: null
+          }));
           setEquipment(newEquipment);
         } catch (error) {
           const message = error.response.data.Message;
@@ -181,7 +177,6 @@ export default function OrderForm() {
       serial: "",
       repair_concept: "",
       equipment_status: 1,
-      //repair_cost: "",
       observations: "",
       arrived_image: null
     };
@@ -342,7 +337,7 @@ export default function OrderForm() {
                       onChange={(date) => field.onChange(date)}
                       format="DD/MM/YYYY"
                       inputFormat="DD/MM/YYYY"
-                      renderInput={(params) => <TextField {...params} value={convertedDate} />} // Asignar el valor convertido al campo de entrada                    
+                      renderInput={(inputParams) => <TextField {...inputParams} />} // Asignar el valor convertido al campo de entrada                    
                       error={!!errors.receipt_date}
                       helperText={errors.receipt_date?.message}
                     />

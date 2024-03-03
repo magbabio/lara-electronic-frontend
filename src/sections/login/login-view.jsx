@@ -49,7 +49,7 @@ export default function LoginView() {
 
   useEffect(() => {
     if (isAuthenticated) navigate('/')
-  }, [isAuthenticated])
+  }, [isAuthenticated, navigate])
 
   const onSubmit = handleSubmit(async (data) => {
     setErrorMessage('');

@@ -60,7 +60,7 @@ export default function CustomersTableToolbar({ numSelected, onSearchResults, on
       setSearchResults([]); 
       onSearchResults([]);
     }
-  }, [searchTerm]);
+  }, [searchTerm, onSearchResults]);
 
   return (
     <Toolbar

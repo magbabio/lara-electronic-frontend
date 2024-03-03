@@ -105,17 +105,17 @@ export default function CustomerForm() {
     const documentNumberError = valDocumentNumber(data.document_number);
     const firstNameError = valFirstName(data.first_name);
     const lastNameError = valLastName(data.last_name);
-    //const addressError = valAddress(data.address);
     const phoneError = valPhone(data.phone);
     const emailError = valEmail(data.email);
 
-    if ( documentNumberError,
-      firstNameError,
-      lastNameError,
+    if (
+      documentNumberError ||
+      firstNameError ||
+      lastNameError ||
       // addressError
-      phoneError,
+      phoneError ||
       emailError
-      ) {
+    ) {
       setErrors({
         document_number: documentNumberError,
         first_name: firstNameError,
@@ -124,7 +124,7 @@ export default function CustomerForm() {
         phone: phoneError,
         email: emailError
       });
-      return; 
+      return;
     }
 
     if (params.id) {

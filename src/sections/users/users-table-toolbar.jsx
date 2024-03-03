@@ -24,9 +24,7 @@ export default function UsersTableToolbar({ numSelected, filterDocument, onFilte
           bgcolor: 'primary.lighter',
         }),
       }}
-    >
-     
-    </Toolbar>
+    />
   );
 }
 

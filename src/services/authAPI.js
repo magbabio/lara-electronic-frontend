@@ -2,7 +2,7 @@ import { API_URL } from 'src/config';
 
 import { http } from './http';
 
-const API =  API_URL;
+const API = API_URL;
 
 export const loginRequest = user => http.post(`${API}/auth/login `, user);
 

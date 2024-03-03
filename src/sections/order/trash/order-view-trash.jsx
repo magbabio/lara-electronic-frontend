@@ -61,11 +61,11 @@ export default function OrdersTrashPage() {
     const fetchOrders = async () => {
       try {
         const response = await getDeletedOrdersRequest();
-        const formattedOrders = response.data.Data.map((order) => ({
-          ...order,
-          receipt_date: formatDate(order.receipt_date),
-          deleted_at: formatDate(order.deleted_at), 
-          updated_at: formatDate(order.updated_at),
+        const formattedOrders = response.data.Data.map((orderItem) => ({
+          ...orderItem,
+          receipt_date: formatDate(orderItem.receipt_date),
+          deleted_at: formatDate(orderItem.deleted_at), 
+          updated_at: formatDate(orderItem.updated_at),
         }));
         setOrders(formattedOrders);
       } catch (error) {
@@ -130,8 +130,15 @@ export default function OrdersTrashPage() {
   
   const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : orders);
+  let dataFiltered;
 
+  if (searchResults.length > 0) {
+    dataFiltered = searchResults;
+  } else if (notFound) {
+    dataFiltered = [];
+  } else {
+    dataFiltered = orders;
+  }
 
   return (
     <Container>

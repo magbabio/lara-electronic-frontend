@@ -133,19 +133,17 @@ export default function OrderShow() {
             setValue('address', response.data.Data.Customer.address);
             setValue('phone', response.data.Data.Customer.phone);
             const equipmentData = response.data.Data.Equipment;
-            const newEquipment = equipmentData.map((item, index) => {
-              return {
-                key: index + 1,
-                description: item.description,
-                brand: item.brand,
-                model: item.model,
-                serial: item.serial,
-                repair_concept: item.repair_concept,
-                equipment_status: getEquipmentStatusText(item.equipment_status),
-                observations: item.observations,
-                arrived_image: null
-              };
-            });
+            const newEquipment = equipmentData.map((item, index) => ({
+              key: index + 1,
+              description: item.description,
+              brand: item.brand,
+              model: item.model,
+              serial: item.serial,
+              repair_concept: item.repair_concept,
+              equipment_status: getEquipmentStatusText(item.equipment_status),
+              observations: item.observations,
+              arrived_image: null
+            }));
             setEquipment(newEquipment);
           } catch (error) {
             const message = error.response.data.Message;

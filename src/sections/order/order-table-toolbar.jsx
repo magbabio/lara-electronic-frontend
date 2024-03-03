@@ -41,7 +41,6 @@ export default function OrdersTableToolbar({ numSelected, onSearchResults, onSea
     try {
       setIsLoading(true);
         const response = await searchOrderByEquipmentSerial(value);
-        console.log(response);
         const formattedOrders = response.data.Data.map((order) => ({
           ...order,
           receipt_date: formatDate(order.receipt_date),
@@ -79,7 +78,7 @@ export default function OrdersTableToolbar({ numSelected, onSearchResults, onSea
       setSearchResults([]); 
       onSearchResults([]);
     }
-  }, [searchTerm]);
+  }, [searchTerm, onSearchResults]);
 
   return (
     <Toolbar

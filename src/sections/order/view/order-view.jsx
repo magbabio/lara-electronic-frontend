@@ -59,12 +59,12 @@ export default function OrdersPage() {
     const fetchOrders = async () => {
       try {
         const response = await getOrdersRequest();
-        const formattedOrders = response.data.Data.map((order) => ({
-          ...order,
-          receipt_date: formatDate(order.receipt_date),
-          created_at: formatDate(order.created_at), 
-          updated_at: formatDate(order.updated_at),
-          order_status: getOrderStatusText(order.order_status),
+        const formattedOrders = response.data.Data.map((orderItem) => ({
+          ...orderItem,
+          receipt_date: formatDate(orderItem.receipt_date),
+          created_at: formatDate(orderItem.created_at), 
+          updated_at: formatDate(orderItem.updated_at),
+          order_status: getOrderStatusText(orderItem.order_status),
         }));
         setOrders(formattedOrders);
       } catch (error) {
@@ -142,7 +142,15 @@ export default function OrdersPage() {
   
   const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : orders);
+  let dataFiltered;
+
+  if (searchResults.length > 0) {
+    dataFiltered = searchResults;
+  } else if (notFound) {
+    dataFiltered = [];
+  } else {
+    dataFiltered = orders;
+  }
 
   return (
     <Container>

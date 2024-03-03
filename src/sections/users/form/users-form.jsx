@@ -121,7 +121,12 @@ export default function UserForm() {
     const phoneError = valPhone(data.phone);
     const emailError = valEmail(data.email);
 
-    if ( documentNumberError, firstNameError, lastNameError, phoneError, emailError ) {
+    if ( 
+      documentNumberError || 
+      firstNameError ||
+      lastNameError || 
+      phoneError || 
+      emailError ) {
       setErrors({
         document_number: documentNumberError,
         first_name: firstNameError,

@@ -6,7 +6,7 @@ import { useAuth } from 'src/context/AuthContext';
 function ProtectedRoute() {
   const { loading, isAuthenticated } = useAuth();
 
-  if (loading) return 
+  if (loading) return null
   const token = localStorage.getItem('token');
   if (!loading && !isAuthenticated && !token) return <Navigate to='/login' replace />
   
