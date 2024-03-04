@@ -7,8 +7,8 @@ export const URL = API_URL
 export const http = axios.create({
   baseURL: URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+  // headers: {
+  //   'Content-Type': 'application/json',
+  //   'Accept': 'application/json'
+  // }
 })

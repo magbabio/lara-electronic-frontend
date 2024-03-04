@@ -49,7 +49,7 @@ export default function LoginView() {
 
   useEffect(() => {
     if (isAuthenticated) navigate('/')
-  }, [isAuthenticated])
+  }, [isAuthenticated, navigate])
 
   const onSubmit = handleSubmit(async (data) => {
     setErrorMessage('');
@@ -64,6 +64,7 @@ export default function LoginView() {
     try {
       setIsLoading(true);
       const response = await signin(data);
+      console.log(response);
     } catch (error) {
       const message = error.response.data.Message;
       setErrorMessage(message);

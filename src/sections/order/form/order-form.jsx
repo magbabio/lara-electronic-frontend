@@ -1,6 +1,5 @@
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
-//import {useDropzone} from 'react-dropzone'
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -78,21 +77,19 @@ export default function OrderForm() {
           setValue('last_name', response.data.Data.Customer.last_name);
           setValue('address', response.data.Data.Customer.address);
           setValue('phone', response.data.Data.Customer.phone);
+          setValue('email', response.data.Data.Customer.email);
           const equipmentData = response.data.Data.Equipment;
-          const newEquipment = equipmentData.map((item, index) => {
-            return {
-              key: index + 1,
-              description: item.description,
-              brand: item.brand,
-              model: item.model,
-              serial: item.serial,
-              repair_concept: item.repair_concept,
-              //repair_cost: item.repair_cost,
-              equipment_status: item.equipment_status,
-              observations: item.observations,
-              arrived_image: null
-            };
-          });
+          const newEquipment = equipmentData.map((item, index) => ({
+            key: index + 1,
+            description: item.description,
+            brand: item.brand,
+            model: item.model,
+            serial: item.serial,
+            repair_concept: item.repair_concept,
+            equipment_status: item.equipment_status,
+            observations: item.observations,
+            arrived_image: null
+          }));
           setEquipment(newEquipment);
         } catch (error) {
           const message = error.response.data.Message;
@@ -144,6 +141,7 @@ export default function OrderForm() {
       setValue('last_name', response.data.Data.last_name);
       setValue('address', response.data.Data.address);
       setValue('phone', response.data.Data.phone);
+      setValue('email', response.data.Data.email);
       setShowCustomerFields(true);
     } catch (error) {
       const message = error.response.data.Message;
@@ -179,7 +177,6 @@ export default function OrderForm() {
       serial: "",
       repair_concept: "",
       equipment_status: 1,
-      //repair_cost: "",
       observations: "",
       arrived_image: null
     };
@@ -322,31 +319,8 @@ export default function OrderForm() {
                 1. Datos de la orden
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
-            <Controller
-              name="number"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  required
-                  fullWidth
-                  label="Número de orden"
-                  id="number"
-                  value={field.value || ''}
-                  // InputLabelProps={{ shrink: !!field.value }}
-                  InputProps={{
-                    inputComponent: OrderNumber
-                  }}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  {...register("number")}
-                  error={!!errors.number} 
-                  helperText={errors.number}     
-                />
-              )}
-            />
-            </Grid>        
-            <Grid item xs={12} sm={6} md={6}>
+
+            <Grid item xs={12} sm={4} md={4}>
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es" dateLibInstance={dayjs}>
                 <Controller
                   name="receipt_date"
@@ -363,7 +337,7 @@ export default function OrderForm() {
                       onChange={(date) => field.onChange(date)}
                       format="DD/MM/YYYY"
                       inputFormat="DD/MM/YYYY"
-                      renderInput={(params) => <TextField {...params} value={convertedDate} />} // Asignar el valor convertido al campo de entrada                    
+                      renderInput={(inputParams) => <TextField {...inputParams} />} // Asignar el valor convertido al campo de entrada                    
                       error={!!errors.receipt_date}
                       helperText={errors.receipt_date?.message}
                     />
@@ -371,7 +345,7 @@ export default function OrderForm() {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={4} md={4}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
               <Controller
@@ -394,7 +368,7 @@ export default function OrderForm() {
               />
             </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={4} md={4}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Estado de la orden</InputLabel>
               <Controller
@@ -414,6 +388,26 @@ export default function OrderForm() {
                 )}
               />
             </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                multiline
+                rows={4}
+                name="observations"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    multiline
+                    rows={4}
+                    required
+                    fullWidth
+                    label="Observaciones de la orden"
+                    id="observations"
+                  />
+                )}
+              />
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
@@ -560,6 +554,24 @@ export default function OrderForm() {
                 )}
               />
             </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Controller
+                disabled
+                name="email"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    label="Correo electrónico"
+                    id="email"
+                    {...register("email")}
+                  />
+                )}
+              />
+            </Grid>            
             <Grid item xs={0} sm={0} md={0}>
               <Controller
                 name="customer_id"
@@ -605,7 +617,7 @@ export default function OrderForm() {
                 <Grid item xs={12} sm={6} md={6}>
                 <TextField
                   required
-                  label="Nombre"
+                  label="Equipo"
                   fullWidth
                   value={item.description}
                   onChange={(e) => handleInputChange(index, 'description', e.target.value)}
@@ -741,27 +753,6 @@ export default function OrderForm() {
             <Grid item xs={12} sm={12} md={12}>
               <Divider/>
             </Grid> 
-
-            <Grid item xs={12} sm={12} md={12}>
-              <Controller
-                multiline
-                rows={4}
-                name="observations"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    multiline
-                    rows={4}
-                    required
-                    fullWidth
-                    label="Observaciones de la orden"
-                    id="observations"
-                  />
-                )}
-              />
-            </Grid>
 
             <AlertDialog 
               openAlertDialog={openAlertDialog} 

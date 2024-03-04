@@ -1,7 +1,7 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-import checker from 'vite-plugin-checker';
+import checker from 'vite-plugin-checker'; 
 
 // ----------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ export default defineConfig({
     ],
   },
   server: {
-    host: '192.168.1.107',
+    host: '192.168.1.108',
     port: 3030,
   },
   preview: {

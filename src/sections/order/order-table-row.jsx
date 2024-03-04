@@ -48,10 +48,10 @@ export default function OrdersTableRow({
     const fetchCustomers = async () => {
       try {
         const customers = await getCustomersRequest(); // Obtén los datos de todos los clientes
-        const customer = customers.data.Data.find((customer) => customer.id === customer_id); // Busca el cliente correspondiente por id
-        if (customer) {
-          setCustomerFirstName(customer.first_name);
-          setCustomerLastName(customer.last_name);
+        const foundCustomer = customers.data.Data.find((customer) => customer.id === customer_id); // Busca el cliente correspondiente por id
+        if (foundCustomer) {
+          setCustomerFirstName(foundCustomer.first_name);
+          setCustomerLastName(foundCustomer.last_name);
         }
       } catch (error) {
         console.log(error);
@@ -65,9 +65,9 @@ export default function OrdersTableRow({
     const fetchUsers = async () => {
       try {
         const users = await getUsersRequest(); // Obtén los datos de todos los clientes
-        const user = users.data.Data.find((user) => user.id === user_id); // Busca el cliente correspondiente por id
-        if (user) {
-          setUserFirstName(user.first_name);
+        const foundUser = users.data.Data.find((user) => user.id === user_id); // Busca el cliente correspondiente por id
+        if (foundUser) {
+          setUserFirstName(foundUser.first_name);
         }
       } catch (error) {
         console.log(error);
@@ -134,10 +134,11 @@ export default function OrdersTableRow({
   }
 
   const handleOrderDocument = async () => {
+    setIsLoading(true);
     setErrorMessage('');
     try {
-      setIsLoading(true);
       const response = await generateOrderDocumentRequest(id);
+      console.log('QUE PASSOOO', response);
       const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
       const pdfUrl = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
@@ -145,8 +146,8 @@ export default function OrdersTableRow({
       link.target = '_blank';
       link.click();
     } catch (error) {
-      console.log(error);
-      const message = error.response.data.Message;
+      console.log('AAAAAAAAAAAAA',error.response);
+      const message = error.response.statusText;
       setErrorMessage(message);
     } finally {
       setIsLoading(false);
@@ -277,9 +278,11 @@ export default function OrdersTableRow({
 
 OrdersTableRow.propTypes = {
   id: PropTypes.any,
+  selected: PropTypes.any,
   created_at: PropTypes.any,
   handleClick: PropTypes.func,
   number: PropTypes.string,
+  user_id: PropTypes.any,
   customer_id: PropTypes.string,
   receipt_date: PropTypes.string,
   order_status: PropTypes.any,

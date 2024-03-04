@@ -129,8 +129,16 @@ export default function CustomersTrashPage() {
   
   const notFound = searchResults.length === 0 && searchTerm !== '';
 
-  const dataFiltered = searchResults.length > 0 ? searchResults : (notFound ? [] : customers);
+  let dataFiltered;
 
+  if (searchResults.length > 0) {
+    dataFiltered = searchResults;
+  } else if (notFound) {
+    dataFiltered = [];
+  } else {
+    dataFiltered = customers;
+  }
+  
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} gap={2}>

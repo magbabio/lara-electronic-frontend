@@ -48,6 +48,7 @@ export default function CustomerForm() {
       last_name: "",
       address: "",
       phone: "", 
+      second_phone: "",
       email: "",
       notes: "" 
     },
@@ -80,6 +81,7 @@ export default function CustomerForm() {
           setValue('last_name', response.data.Data.last_name);
           setValue('address', response.data.Data.address);
           setValue('phone', response.data.Data.phone);
+          setValue('second_phone', response.data.Data.second_phone);
           setValue('email', response.data.Data.email);
           setValue('notes', response.data.Data.notes);
         } catch (error) {
@@ -103,17 +105,17 @@ export default function CustomerForm() {
     const documentNumberError = valDocumentNumber(data.document_number);
     const firstNameError = valFirstName(data.first_name);
     const lastNameError = valLastName(data.last_name);
-    //const addressError = valAddress(data.address);
     const phoneError = valPhone(data.phone);
     const emailError = valEmail(data.email);
 
-    if ( documentNumberError,
-      firstNameError,
-      lastNameError,
+    if (
+      documentNumberError ||
+      firstNameError ||
+      lastNameError ||
       // addressError
-      phoneError,
+      phoneError ||
       emailError
-      ) {
+    ) {
       setErrors({
         document_number: documentNumberError,
         first_name: firstNameError,
@@ -122,7 +124,7 @@ export default function CustomerForm() {
         phone: phoneError,
         email: emailError
       });
-      return; 
+      return;
     }
 
     if (params.id) {
@@ -313,7 +315,7 @@ export default function CustomerForm() {
                     {...field}
                     required
                     fullWidth
-                    label="Teléfono"
+                    label="Teléfono 1"
                     id="phone"
                     InputProps={{
                       inputComponent: Phone
@@ -327,6 +329,28 @@ export default function CustomerForm() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>
+              <Controller
+                name="second_phone"
+                control={control}
+                defaultValue="" 
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Teléfono 2"
+                    id="second_phone"
+                    InputProps={{
+                      inputComponent: Phone
+                    }}
+                    {...register("second_phone")} 
+                    error={!!errors.phone} 
+                    helperText={errors.phone} 
+                  />
+                )}
+              />
+            </Grid>            
+
+            <Grid item xs={12} sm={12} md={12}>
               <Controller
                 name="email"
                 control={control}

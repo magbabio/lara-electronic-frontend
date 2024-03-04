@@ -44,10 +44,10 @@ export default function OrdersTableRowTrash({
     const fetchCustomers = async () => {
       try {
         const customers = await getCustomersRequest(); // Obtén los datos de todos los clientes
-        const customer = customers.data.Data.find((customer) => customer.id === customer_id); // Busca el cliente correspondiente por id
-        if (customer) {
-          setCustomerFirstName(customer.first_name);
-          setCustomerLastName(customer.last_name);
+        const foundCustomer = customers.data.Data.find((customer) => customer.id === customer_id); // Busca el cliente correspondiente por id
+        if (foundCustomer) {
+          setCustomerFirstName(foundCustomer.first_name);
+          setCustomerLastName(foundCustomer.last_name);
         }
       } catch (error) {
         console.log(error);
@@ -61,9 +61,9 @@ export default function OrdersTableRowTrash({
     const fetchUsers = async () => {
       try {
         const users = await getUsersRequest(); // Obtén los datos de todos los clientes
-        const user = users.data.Data.find((user) => user.id === user_id); // Busca el cliente correspondiente por id
-        if (user) {
-          setUserFirstName(user.first_name);
+        const foundUser = users.data.Data.find((user) => user.id === user_id); // Busca el cliente correspondiente por id
+        if (foundUser) {
+          setUserFirstName(foundUser.first_name);
         }
       } catch (error) {
         console.log(error);
