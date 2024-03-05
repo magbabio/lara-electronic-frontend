@@ -192,7 +192,6 @@ export default function OrdersTrashPage() {
                       deleted_at={row.deleted_at}
                       number={row.number}
                       customer_id={row.customer_id}
-                      receipt_date={row.receipt_date}
                       user_id={row.user_id}
                       order_status={row.order_status}
                       selected={selected.indexOf(row.deleted_at) !== -1}

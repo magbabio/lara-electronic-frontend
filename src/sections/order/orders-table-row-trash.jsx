@@ -135,8 +135,6 @@ export default function OrdersTableRowTrash({
 
         <TableCell>{customerFirstName} {customerLastName}</TableCell>
 
-        <TableCell>{receipt_date}</TableCell>
-
         <TableCell>{userFirstName}</TableCell>
 
         <TableCell align="right">
