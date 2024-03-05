@@ -317,7 +317,7 @@ export default function OrderForm() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={4} md={4}>
+            <Grid item xs={12} sm={6} md={6}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
               <Controller
@@ -340,7 +340,7 @@ export default function OrderForm() {
               />
             </FormControl>
             </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            <Grid item xs={12} sm={6} md={6}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Estado de la orden</InputLabel>
               <Controller
