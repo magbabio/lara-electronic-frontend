@@ -24,9 +24,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import DescriptionAlert from 'src/utils/alert';
 import LoadingBackdrop from 'src/utils/loading';
 import { OrderNumber, DocumentNumber } from 'src/utils/masks';
-import { 
-        valReceiptDate
-} from 'src/utils/validations/orderSchema';
 
 import { getUsersRequest } from 'src/services/user/userAPI';
 import { getCustomerByDocumentRequest } from 'src/services/customer/customerAPI';
@@ -320,31 +317,6 @@ export default function OrderForm() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={4} md={4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es" dateLibInstance={dayjs}>
-                <Controller
-                  name="receipt_date"
-                  control={control}
-                  defaultValue={null}
-                  rules={{ validate: valReceiptDate }}
-                  render={({ field }) => (
-                    <DatePicker
-                      {...field}
-                      slotProps={{ textField: { fullWidth: true } }}
-                      disableFuture
-                      label="Fecha de recepción"
-                      value={params.id ? dayjs(field.value || null, "DD/MM/YYYY") : field.value || null}
-                      onChange={(date) => field.onChange(date)}
-                      format="DD/MM/YYYY"
-                      inputFormat="DD/MM/YYYY"
-                      renderInput={(inputParams) => <TextField {...inputParams} />} // Asignar el valor convertido al campo de entrada                    
-                      error={!!errors.receipt_date}
-                      helperText={errors.receipt_date?.message}
-                    />
-                  )}
-                />
-              </LocalizationProvider>
-            </Grid>
             <Grid item xs={12} sm={4} md={4}>
             <FormControl fullWidth required>
               <InputLabel id="demo-simple-select-label">Recibido por</InputLabel>
