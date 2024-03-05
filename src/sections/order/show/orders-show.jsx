@@ -212,25 +212,6 @@ export default function OrderShow() {
             <Grid item xs={12} sm={6} md={6}>
               <Controller
                 disabled
-                name="receipt_date"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    required
-                    fullWidth
-                    label="Fecha de recepción"
-                    id="receipt_date"
-                    {...register("receipt_date")}
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={6}>
-              <Controller
-                disabled
                 name="received_by"
                 control={control}
                 defaultValue=""
