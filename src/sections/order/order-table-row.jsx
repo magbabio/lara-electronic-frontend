@@ -189,8 +189,6 @@ export default function OrdersTableRow({
 
         <TableCell>{customerFirstName} {customerLastName}</TableCell>
 
-        <TableCell>{receipt_date}</TableCell>
-
         <TableCell>{userFirstName}</TableCell>
 
         <TableCell>

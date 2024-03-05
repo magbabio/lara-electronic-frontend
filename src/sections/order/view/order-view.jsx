@@ -203,7 +203,6 @@ export default function OrdersPage() {
                       created_at={row.created_at}
                       number={row.number}
                       customer_id={row.customer_id}
-                      receipt_date={row.receipt_date}
                       user_id={row.user_id}
                       order_status={row.order_status}
                       selected={selected.indexOf(row.created_at) !== -1}
