@@ -27,7 +27,7 @@ export default defineConfig({
     ],
   },
   server: {
-    host: '192.168.1.107',
+    host: '44.226.145.213',
     port: 3030,
   },
   preview: {
